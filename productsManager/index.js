@@ -1,6 +1,5 @@
 const fs = require("fs").promises;
 const path = require("path");
-const mockProducts = require("./mockData");
 
 class ProductManager {
   constructor(pathToFile) {
@@ -127,32 +126,5 @@ class ProductManager {
     }
   }
 }
-
-const pathFile = path.join(__dirname, "products.json");
-const pm = new ProductManager(pathFile);
-
-// pm.addProduct({
-//   title: "Chaqueta Impermeable Ligera",
-//   description:
-//     "Chaqueta cortavientos y resistente al agua, ideal para el trail.",
-//   code: "CHAQ-200",
-//   price: 119.5,
-//   status: true,
-//   stock: 20,
-//   category: "Ropa",
-//   thumbnails: "https://example.com/images/chaqueta-200.jpg",
-// });
-
-// pm.getProductById(2).then((data) => console.log('product', data));
-
-// pm.updateProduct(2, {
-//   price: 79.99,
-//   stock: 15,
-//   status: false,
-// });
-
-// pm.deleteProduct(3);
-
-// pm.getProducts().then((data) => console.log("products", data));
 
 module.exports = ProductManager;
