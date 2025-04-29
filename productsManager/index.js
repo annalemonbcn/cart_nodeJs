@@ -49,8 +49,9 @@ class ProductManager {
       console.error("Product already exists");
       return;
     }
+
     const newProduct = {
-      id: products.length + 1,
+      id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
       title,
       description,
       code,
@@ -106,7 +107,7 @@ class ProductManager {
     }
   }
 
-  async removeProduct(productId) {
+  async deleteProduct(productId) {
     const products = await this.#readData();
 
     const index = this.#findProductIndexById(products, productId);
@@ -130,19 +131,19 @@ class ProductManager {
 const pathFile = path.join(__dirname, "products.json");
 const pm = new ProductManager(pathFile);
 
-// mockProducts.map((product) => pm.addProduct(product));
 // pm.addProduct({
-//   title: "Mochila Hidratación 10L",
-//   description: "Mochila compacta con bolsa de hidratación incluida.",
-//   code: "MOCH-010",
-//   price: 54.95,
+//   title: "Chaqueta Impermeable Ligera",
+//   description:
+//     "Chaqueta cortavientos y resistente al agua, ideal para el trail.",
+//   code: "CHAQ-200",
+//   price: 119.5,
 //   status: true,
-//   stock: 35,
-//   category: "Accesorios",
-//   thumbnails: "https://example.com/images/mochila-010.jpg",
+//   stock: 20,
+//   category: "Ropa",
+//   thumbnails: "https://example.com/images/chaqueta-200.jpg",
 // });
 
-// pm.getProductById(3).then((data) => console.log('product', data));
+// pm.getProductById(2).then((data) => console.log('product', data));
 
 // pm.updateProduct(2, {
 //   price: 79.99,
@@ -150,6 +151,8 @@ const pm = new ProductManager(pathFile);
 //   status: false,
 // });
 
-pm.getProducts().then((data) => console.log("products", data));
+// pm.deleteProduct(3);
+
+// pm.getProducts().then((data) => console.log("products", data));
 
 module.exports = ProductManager;
