@@ -8,8 +8,8 @@ class CartManager {
 
   async #readData() {
     try {
-      const carts = await fs.readFile(this.file, "utf-8");
-      return JSON.parse(carts);
+      const data = await fs.readFile(this.file, "utf-8");
+      return JSON.parse(data);
     } catch (error) {
       if (error.code === "ENOENT") return [];
       throw new Error("Error reading the file");
@@ -24,45 +24,66 @@ class CartManager {
     }
   }
 
-  async addCart(product) {
-    // Get carts from db
+  #findCartIndexById(carts, id) {
+    return carts.findIndex((cart) => cart.id === id);
+  }
+
+  async addCart() {
     const carts = await this.#readData();
 
-    // Create newCart + push it
     const newCart = {
-      id: carts.length + 1,
+      id: carts.length > 0 ? carts[carts.length - 1].id + 1 : 1,
       products: [],
     };
 
     carts.push(newCart);
 
-    await this.#writeData(carts);
-    console.log("Cart added");
+    try {
+      await this.#writeData(carts);
+    } catch (error) {
+      console.error("Cart couldn't be created", error);
+    }
   }
 
-  async getCart(cartId) {
+  async getCartById(cartId) {
     const carts = await this.#readData();
-    const selectedCart = carts.find(
-      (cart) => parseInt(cart.id) === parseInt(cartId)
-    );
+    const index = this.#findCartIndexById(carts, cartId);
 
-    return selectedCart ? selectedCart : null;
+    if (index === -1) {
+      console.error(`Cart with id ${cartId} doesn't exist`);
+      return;
+    }
+
+    return carts[index].products;
   }
 
   async addProductToCart(cartId, product) {
-    const selectedCart = await getCart(cartId);
-    if (!selectedCart) return null;
+    const carts = await this.#readData();
+    const index = this.#findCartIndexById(carts, parseInt(cartId));
 
-    
+    if (index === -1) {
+      console.error(`Cart with id ${cartId} doesn't exist`);
+      return;
+    }
+
+    const cart = carts[index];
+    const productIndex = cart.products.findIndex(
+      (item) => item.product === product.id
+    );
+
+    if (productIndex === -1) {
+      cart.products.push({ product: product.id, quantity: 1 });
+    } else {
+      cart.products[productIndex].quantity += 1;
+    }
+
+    try {
+      await this.#writeData(carts);
+      console.log(`Product ${product.id} added to cart ${cartId}`);
+    } catch (error) {
+      console.error("Failed to add product to cart", error);
+    }
   }
 }
 
-// const filePath = path.join(__dirname, "carts.json");
-// const cm = new CartManager(filePath);
-
 module.exports = CartManager;
-
-// type Cart = {
-//   id: number
-//   products: []
-// }
