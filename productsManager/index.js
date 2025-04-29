@@ -25,6 +25,14 @@ class ProductManager {
     }
   }
 
+  #findProductIndexById(products, id) {
+    return products.findIndex((product) => product.id === id);
+  }
+
+  #findProductByCode(products, code) {
+    return products.find((product) => product.code === code);
+  }
+
   async addProduct({
     title,
     description,
@@ -37,13 +45,10 @@ class ProductManager {
   }) {
     const products = await this.#readData();
 
-    const productExists = products.find((product) => product.code === code);
-
-    if (productExists) {
-      console.error("Product code already exists");
+    if (this.#findProductByCode(products, code)) {
+      console.error("Product already exists");
       return;
     }
-
     const newProduct = {
       id: products.length + 1,
       title,
@@ -79,6 +84,47 @@ class ProductManager {
       ? selectedProduct
       : console.error(`Product with id ${productId} doesn't exist`);
   }
+
+  async updateProduct(productId, updatedFields) {
+    const products = await this.#readData();
+
+    const index = this.#findProductIndexById(products, productId);
+
+    if (index === -1) {
+      console.error(`Product with id ${productId} doesn't exist`);
+      return;
+    }
+
+    delete updatedFields.id;
+    products[index] = { ...products[index], ...updatedFields };
+
+    try {
+      await this.#writeData(products);
+      console.log(`Product with id ${productId} updated successfully`);
+    } catch (error) {
+      console.error("Failed to update product", error);
+    }
+  }
+
+  async removeProduct(productId) {
+    const products = await this.#readData();
+
+    const index = this.#findProductIndexById(products, productId);
+
+    if (index === -1) {
+      console.error(`Product with id ${productId} doesn't exist`);
+      return;
+    }
+
+    products.splice(index, 1);
+
+    try {
+      await this.#writeData(products);
+      console.log(`Product with id ${productId} deleted successfully`);
+    } catch (error) {
+      console.error("Failed to delete product", error);
+    }
+  }
 }
 
 const pathFile = path.join(__dirname, "products.json");
@@ -96,8 +142,14 @@ const pm = new ProductManager(pathFile);
 //   thumbnails: "https://example.com/images/mochila-010.jpg",
 // });
 
-// pm.getProducts().then((data) => console.log("products", data));
-
 // pm.getProductById(3).then((data) => console.log('product', data));
+
+// pm.updateProduct(2, {
+//   price: 79.99,
+//   stock: 15,
+//   status: false,
+// });
+
+pm.getProducts().then((data) => console.log("products", data));
 
 module.exports = ProductManager;

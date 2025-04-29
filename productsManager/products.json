@@ -15,9 +15,9 @@
     "title": "Zapatillas Trail Running",
     "description": "Zapatillas ligeras y resistentes para correr en montaña.",
     "code": "TRAIL-001",
-    "price": 89.99,
-    "status": true,
-    "stock": 50,
+    "price": 79.99,
+    "status": false,
+    "stock": 15,
     "category": "Calzado",
     "thumbnails": "https://example.com/images/trail-001.jpg"
   },
