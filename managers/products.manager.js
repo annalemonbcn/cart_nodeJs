@@ -11,7 +11,7 @@ class ProductManager {
       return JSON.parse(data);
     } catch (error) {
       if (error.code === "ENOENT") return [];
-      throw new Error("Error reading the file");
+      throw new Error(`Error reading the file: ${error.message}`);
     }
   }
 
@@ -19,7 +19,7 @@ class ProductManager {
     try {
       await fs.writeFile(this.file, JSON.stringify(data, null, 2));
     } catch (error) {
-      throw new Error("Error at writeFile");
+      throw new Error(`Error at writeFile: ${error.message}`);
     }
   }
 
@@ -77,7 +77,7 @@ class ProductManager {
     try {
       await this.#writeData(products);
     } catch (error) {
-      throw new Error("Product couldn't be added to cart", error);
+      throw new Error(`Product couldn't be added to cart: ${error.message}`);
     }
   }
 
@@ -88,7 +88,7 @@ class ProductManager {
   async getProductById(productId) {
     const products = await this.#readData();
     const selectedProduct = products.find(
-      (product) => product.id === productId
+      (product) => parseInt(product.id) === parseInt(productId)
     );
 
     return selectedProduct ? selectedProduct : null;
@@ -108,7 +108,7 @@ class ProductManager {
     try {
       await this.#writeData(products);
     } catch (error) {
-      throw new Error("Failed to update product", error);
+      throw new Error(`Failed to update product: ${error.message}`);
     }
   }
 
@@ -125,7 +125,7 @@ class ProductManager {
     try {
       await this.#writeData(products);
     } catch (error) {
-      throw new Error("Failed to delete product", error);
+      throw new Error(`Failed to delete product: ${error.message}`);
     }
   }
 }

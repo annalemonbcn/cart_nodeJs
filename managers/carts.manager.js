@@ -1,5 +1,4 @@
 const fs = require("fs/promises");
-const path = require("path");
 
 class CartManager {
   constructor(pathToFile) {
@@ -12,7 +11,7 @@ class CartManager {
       return JSON.parse(data);
     } catch (error) {
       if (error.code === "ENOENT") return [];
-      throw new Error("Error reading the file");
+      throw new Error(`Error reading the file: ${error.message}`);
     }
   }
 
@@ -20,7 +19,7 @@ class CartManager {
     try {
       await fs.writeFile(this.file, JSON.stringify(data, null, 2));
     } catch (error) {
-      throw new error("Error at writeFile");
+      throw new error(`Error at writeFile: ${error.message}`);
     }
   }
 
@@ -41,7 +40,7 @@ class CartManager {
     try {
       await this.#writeData(carts);
     } catch (error) {
-      throw new Error("Cart couldn't be created", error);
+      throw new Error(`Cart couldn't be created: ${error.message}`);
     }
   }
 
@@ -75,7 +74,7 @@ class CartManager {
     try {
       await this.#writeData(carts);
     } catch (error) {
-      throw new Error("Failed to add product to cart", error);
+      throw new Error(`Failed to add product to cart: ${error.message}`);
     }
   }
 }
