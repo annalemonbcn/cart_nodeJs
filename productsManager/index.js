@@ -1,5 +1,4 @@
 const fs = require("fs").promises;
-const path = require("path");
 
 class ProductManager {
   constructor(pathToFile) {
@@ -20,12 +19,12 @@ class ProductManager {
     try {
       await fs.writeFile(this.file, JSON.stringify(data, null, 2));
     } catch (error) {
-      throw new error("Error at writeFile");
+      throw new Error("Error at writeFile");
     }
   }
 
   #findProductIndexById(products, id) {
-    return products.findIndex((product) => product.id === id);
+    return products.findIndex((product) => product.id === parseInt(id));
   }
 
   #findProductByCode(products, code) {
@@ -42,12 +41,24 @@ class ProductManager {
     category,
     thumbnails,
   }) {
+    if (
+      !title ||
+      !description ||
+      !code ||
+      !price ||
+      !status ||
+      !stock ||
+      !category ||
+      !thumbnails
+    )
+      throw new Error(
+        "Incomplete request. All attributes are mandatory: title, description, code, price, status, stock, category and thumbnails"
+      );
+
     const products = await this.#readData();
 
-    if (this.#findProductByCode(products, code)) {
-      console.error("Product already exists");
-      return;
-    }
+    if (this.#findProductByCode(products, code))
+      throw new Error("Product code already exists");
 
     const newProduct = {
       id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
@@ -66,7 +77,7 @@ class ProductManager {
     try {
       await this.#writeData(products);
     } catch (error) {
-      console.error("Product couldn't be added to cart", error);
+      throw new Error("Product couldn't be added to cart", error);
     }
   }
 
@@ -80,9 +91,7 @@ class ProductManager {
       (product) => product.id === productId
     );
 
-    return selectedProduct
-      ? selectedProduct
-      : console.error(`Product with id ${productId} doesn't exist`);
+    return selectedProduct ? selectedProduct : null;
   }
 
   async updateProduct(productId, updatedFields) {
@@ -90,19 +99,16 @@ class ProductManager {
 
     const index = this.#findProductIndexById(products, productId);
 
-    if (index === -1) {
-      console.error(`Product with id ${productId} doesn't exist`);
-      return;
-    }
+    if (index === -1)
+      throw new Error(`Product with id ${productId} doesn't exist`);
 
     delete updatedFields.id;
     products[index] = { ...products[index], ...updatedFields };
 
     try {
       await this.#writeData(products);
-      console.log(`Product with id ${productId} updated successfully`);
     } catch (error) {
-      console.error("Failed to update product", error);
+      throw new Error("Failed to update product", error);
     }
   }
 
@@ -111,18 +117,15 @@ class ProductManager {
 
     const index = this.#findProductIndexById(products, productId);
 
-    if (index === -1) {
-      console.error(`Product with id ${productId} doesn't exist`);
-      return;
-    }
+    if (index === -1)
+      throw new Error(`Product with id ${productId} doesn't exist`);
 
     products.splice(index, 1);
 
     try {
       await this.#writeData(products);
-      console.log(`Product with id ${productId} deleted successfully`);
     } catch (error) {
-      console.error("Failed to delete product", error);
+      throw new Error("Failed to delete product", error);
     }
   }
 }
