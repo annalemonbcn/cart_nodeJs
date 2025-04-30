@@ -25,7 +25,7 @@ class CartManager {
   }
 
   #findCartIndexById(carts, id) {
-    return carts.findIndex((cart) => cart.id === id);
+    return carts.findIndex((cart) => cart.id === parseInt(id));
   }
 
   async addCart() {
@@ -41,30 +41,25 @@ class CartManager {
     try {
       await this.#writeData(carts);
     } catch (error) {
-      console.error("Cart couldn't be created", error);
+      throw new Error("Cart couldn't be created", error);
     }
   }
 
   async getCartById(cartId) {
     const carts = await this.#readData();
     const index = this.#findCartIndexById(carts, cartId);
+    console.log("index", index);
 
-    if (index === -1) {
-      console.error(`Cart with id ${cartId} doesn't exist`);
-      return;
-    }
+    if (index === -1) throw new Error(`Cart with id ${cartId} doesn't exist`);
 
     return carts[index].products;
   }
 
   async addProductToCart(cartId, product) {
     const carts = await this.#readData();
-    const index = this.#findCartIndexById(carts, parseInt(cartId));
+    const index = this.#findCartIndexById(carts, cartId);
 
-    if (index === -1) {
-      console.error(`Cart with id ${cartId} doesn't exist`);
-      return;
-    }
+    if (index === -1) throw new Error(`Cart with id ${cartId} doesn't exist`);
 
     const cart = carts[index];
     const productIndex = cart.products.findIndex(
@@ -79,9 +74,8 @@ class CartManager {
 
     try {
       await this.#writeData(carts);
-      console.log(`Product ${product.id} added to cart ${cartId}`);
     } catch (error) {
-      console.error("Failed to add product to cart", error);
+      throw new Error("Failed to add product to cart", error);
     }
   }
 }
