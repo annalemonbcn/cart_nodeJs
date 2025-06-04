@@ -8,4 +8,4 @@ const routes = {
   cartsRoute,
 };
 
-module.exports = routes;
+export default routes;

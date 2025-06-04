@@ -1,15 +1,20 @@
-const express = require("express");
-const handlebars = require("express-handlebars");
-const path = require("path");
-
-const productsRoutes = require("./src/routes/products.routes");
-const cartsRoutes = require("./src/routes/carts.routes");
-const viewsRoutes = require("./src/routes/views.routes");
+import express from "express";
+import { engine } from "express-handlebars";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { createServer } from "http";
+import productsRoutes from "./src/routes/products.routes.js";
+import cartsRoutes from "./src/routes/carts.routes.js";
+import viewsRoutes from "./src/routes/views.routes.js";
 
 const PORT = 8080;
 const app = express();
 
-app.engine("handlebars", handlebars.engine());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "src", "views"));
 
@@ -18,17 +23,13 @@ app.use("/api/products", productsRoutes);
 app.use("/api/carts", cartsRoutes);
 app.use("/", viewsRoutes);
 
-const http = require("http").createServer(app);
+const http = createServer(app);
 
-const { Server } = require("socket.io");
-const io = new Server(http);
+// const { Server } = require("socket.io");
+// const io = new Server(http);
 
-io.on("connection", (socket) => {
-  console.log("connected");
-
-  // socket.on("message", (data) => {
-  //   console.log("data", data);
-  // });
-});
+// io.on("connection", (socket) => {
+//   console.log("connected");
+// });
 
 http.listen(PORT, () => console.log(`Server running on port ${PORT}`));

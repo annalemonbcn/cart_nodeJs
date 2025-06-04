@@ -1,11 +1,16 @@
-const path = require("path");
-const CartsManager = require("../managers/carts.manager");
+import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import CartsManager from "../managers/carts.manager.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const cartsFilePath = path.join(__dirname, "..", "data", "carts.json");
 
 const cm = new CartsManager(cartsFilePath);
 
-exports.createCart = async (req, res) => {
+const createCart = async (req, res) => {
   try {
     await cm.addCart();
     res.status(201).json({
@@ -20,7 +25,7 @@ exports.createCart = async (req, res) => {
   }
 };
 
-exports.getCartById = async (req, res) => {
+const getCartById = async (req, res) => {
   const { cid } = req.params;
   try {
     const cart = await cm.getCartById(cid);
@@ -32,7 +37,7 @@ exports.getCartById = async (req, res) => {
   }
 };
 
-exports.addProductToCart = async (req, res) => {
+const addProductToCart = async (req, res) => {
   const { cid, pid } = req.params;
   const product = { id: pid };
 
@@ -49,3 +54,5 @@ exports.addProductToCart = async (req, res) => {
       .json({ status: "error", code: 400, message: error.message });
   }
 };
+
+export { createCart, getCartById, addProductToCart };

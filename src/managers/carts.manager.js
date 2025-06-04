@@ -1,6 +1,6 @@
-const fs = require("fs/promises");
+import fs from "fs/promises";
 
-class CartManager {
+class CartsManager {
   constructor(pathToFile) {
     this.file = pathToFile;
   }
@@ -47,7 +47,6 @@ class CartManager {
   async getCartById(cartId) {
     const carts = await this.#readData();
     const index = this.#findCartIndexById(carts, cartId);
-    console.log("index", index);
 
     if (index === -1) throw new Error(`Cart with id ${cartId} doesn't exist`);
 
@@ -79,4 +78,4 @@ class CartManager {
   }
 }
 
-module.exports = CartManager;
+export default CartsManager;
