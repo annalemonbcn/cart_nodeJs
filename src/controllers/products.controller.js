@@ -2,6 +2,7 @@ import path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import ProductsManager from "../managers/products.manager.js";
+import ProductModel from "../models/product.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,19 +31,34 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   const product = req.body;
+
   try {
-    await pm.addProduct(product);
+    const newProduct = await ProductModel.create(product);
     res.status(201).json({
       status: "success",
       code: 201,
-      message: "Product created",
-      data: product,
+      message: "Product successfully created",
+      data: newProduct,
     });
   } catch (error) {
     res
       .status(400)
       .json({ status: "error", code: 400, message: error.message });
   }
+
+  // try {
+  //   await pm.addProduct(product);
+  //   res.status(201).json({
+  //     status: "success",
+  //     code: 201,
+  //     message: "Product created",
+  //     data: product,
+  //   });
+  // } catch (error) {
+  //   res
+  //     .status(400)
+  //     .json({ status: "error", code: 400, message: error.message });
+  // }
 };
 
 const updateProduct = async (req, res) => {
