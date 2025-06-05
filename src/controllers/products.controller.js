@@ -94,7 +94,7 @@ const getProductById = async (req, res) => {
         message: `Product with id ${pid} doesn't exist`,
       });
 
-    res.status(200).json({ status: "success", code: 200, data: product });
+    res.status(200).json({ status: "success", code: 200, payload: product });
   } catch (error) {
     console.error("Error while getProductById:", error.message);
     res
@@ -112,7 +112,7 @@ const createProduct = async (req, res) => {
       status: "success",
       code: 201,
       message: "Product successfully created",
-      data: newProduct,
+      payload: newProduct,
     });
   } catch (error) {
     console.error("Error while createProduct:", error.message);
@@ -143,7 +143,7 @@ const updateProduct = async (req, res) => {
       status: "success",
       code: 200,
       message: "Product updated successfully",
-      data: updated,
+      payload: updated,
     });
   } catch (error) {
     console.error("Error while updateProduct:", error.message);
@@ -170,7 +170,7 @@ const deleteProduct = async (req, res) => {
       status: "success",
       code: 200,
       message: "Product deleted successfully",
-      data: deleted,
+      payload: deleted,
     });
   } catch (error) {
     console.error("Error while deleteProduct:", error.message);
