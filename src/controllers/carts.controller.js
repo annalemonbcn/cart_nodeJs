@@ -22,7 +22,7 @@ const createCart = async (req, res) => {
 const getCartById = async (req, res) => {
   const { cid } = req.params;
   try {
-    const cart = await CartModel.findById(cid);
+    const cart = await CartModel.findById(cid).populate("products.productId");
 
     if (!cart)
       return res.status(404).json({
@@ -53,7 +53,15 @@ const addProductToCart = async (req, res) => {
         message: `Cart with id ${cid} doesn't exist`,
       });
 
-    cart.products.push(pid);
+    const productInCart = cart.products.find(
+      ({ productId }) => productId.toString() === pid
+    );
+
+    if (productInCart) {
+      productInCart.quantity += 1;
+    } else {
+      cart.products.push({ productId: pid, quantity: 1 });
+    }
 
     await cart.save();
 
