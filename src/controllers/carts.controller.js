@@ -1,57 +1,73 @@
-import path from "path";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import CartsManager from "../managers/carts.manager.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const cartsFilePath = path.join(__dirname, "..", "data", "carts.json");
-
-const cm = new CartsManager(cartsFilePath);
+import CartModel from "../models/cart.model.js";
 
 const createCart = async (req, res) => {
+  const cart = req.body;
+
   try {
-    await cm.addCart();
+    const newCart = await CartModel.create(cart);
     res.status(201).json({
       status: "success",
       code: 201,
       message: "Cart created successfully",
+      data: newCart,
     });
   } catch (error) {
+    console.error("Error while createCart:", error.message);
     res
-      .status(400)
-      .json({ status: "error", code: 400, message: error.message });
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
   }
 };
 
 const getCartById = async (req, res) => {
   const { cid } = req.params;
   try {
-    const cart = await cm.getCartById(cid);
+    const cart = await CartModel.findById(cid);
+
+    if (!cart)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Cart with id ${cid} doesn't exist`,
+      });
+
     res.status(200).json({ status: "success", code: 200, data: cart });
   } catch (error) {
+    console.error("Error while getCartById:", error.message);
     res
-      .status(404)
-      .json({ status: "error", code: 404, message: error.message });
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
   }
 };
 
 const addProductToCart = async (req, res) => {
   const { cid, pid } = req.params;
-  const product = { id: pid };
 
   try {
-    await cm.addProductToCart(cid, product);
+    const cart = await CartModel.findById(cid);
+
+    if (!cart)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Cart with id ${cid} doesn't exist`,
+      });
+
+    cart.products.push(pid);
+
+    await cart.save();
+
     res.status(200).json({
       status: "success",
       code: 200,
-      message: `Product ${pid} added successfully to cart #${cid}`,
+      message: `Product ${pid} added successfully to cart ${cid}`,
+      data: cart,
     });
   } catch (error) {
+    console.error("Error while addProductToCart:", error.message);
     res
-      .status(400)
-      .json({ status: "error", code: 400, message: error.message });
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
   }
 };
 
