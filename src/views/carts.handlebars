@@ -19,8 +19,20 @@
           </div>
 
           <div class="cart-item-actions">
-            <p class="cart-item-quantity">Quantity: {{this.quantity}}</p>
-            <a href="#" class="remove-from-cart" data-product-id="{{this.product._id}}">Remove from cart</a>
+            <div class="cart-item-quantity-container">
+              <p class="cart-item-quantity">Quantity: {{this.quantity}}</p>
+              <img
+                src="/images/edit-outline.svg"
+                alt="add-to-cart-icon"
+                class="cart-item-edit-icon"
+                data-product-id="{{this.product._id}}"
+              />
+            </div>
+            <a
+              href="#"
+              class="remove-from-cart"
+              data-product-id="{{this.product._id}}"
+            >Remove from cart</a>
           </div>
         </div>
       {{/each}}

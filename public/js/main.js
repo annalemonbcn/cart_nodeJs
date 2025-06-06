@@ -9,8 +9,6 @@ const API_BASE_URL = "/api";
  * @param {object} [body=null] The request body for POST/PUT methods.
  * @returns {Promise<object>} An object with `success` and either `data` or `message`. */
 const apiRequest = async (endpoint, method, body = null) => {
-  console.log(API_BASE_URL);
-  console.log(endpoint);
   try {
     const options = {
       method,
@@ -25,8 +23,6 @@ const apiRequest = async (endpoint, method, body = null) => {
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     const data = await response.json();
-
-    console.log("data", data);
 
     if (response.ok) {
       return { success: true, data };
@@ -62,9 +58,9 @@ const addProductToCart = (cartId, productId) => {
 
 /**
  * Remove a product from the cart.
- * @param {string} cartId ID del carrito.
- * @param {string} productId ID del producto.
- * @returns {Promise<object>} Resultado de la operación.
+ * @param {string} cartId Cart ID.
+ * @param {string} productId Product ID.
+ * @returns {Promise<object>} Result.
  */
 const removeProductFromCart = (cartId, productId) => {
   if (!productId || !cartId) {
@@ -74,6 +70,24 @@ const removeProductFromCart = (cartId, productId) => {
     });
   }
   return apiRequest(`/carts/${cartId}/product/${productId}`, "DELETE");
+};
+
+/**
+ * Update product quantity from the cart.
+ * @param {string} cartId Cart ID.
+ * @param {string} productId Product ID.
+ * @returns {Promise<object>} Resultado de la operación.
+ */
+const updateProductQuantityInCart = (cartId, productId, quantity) => {
+  if (!productId || !cartId || typeof quantity !== "number" || quantity <= 0) {
+    return Promise.resolve({
+      success: false,
+      message: "Invalid Product ID, Cart ID, or quantity for updating cart.",
+    });
+  }
+  return apiRequest(`/carts/${cartId}/product/${productId}`, "PUT", {
+    quantity,
+  });
 };
 
 // --- UI Management ---
@@ -142,7 +156,7 @@ const setupAddToCartButtons = () => {
 };
 
 /**
- * Configure the delete cart buttons.
+ * Configure the delete product from cart buttons.
  */
 const setupRemoveFromCartButtons = () => {
   const removeButtons = document.querySelectorAll(".remove-from-cart");
@@ -160,8 +174,65 @@ const setupRemoveFromCartButtons = () => {
   });
 };
 
+/**
+ * Configure the delete product from cart buttons.
+ */
+const setupEditQuantityButtons = () => {
+  const editIcons = document.querySelectorAll(".cart-item-edit-icon");
+
+  editIcons.forEach((icon) => {
+    icon.addEventListener("click", async (e) => {
+      const button = e.currentTarget;
+      const productId = button.dataset.productId;
+      const cartId = button.dataset.cartId || MOCK_CART_ID;
+
+      if (!productId || !cartId) {
+        alert("Error: Product ID or Cart ID not found for editing.");
+        console.error(
+          "Missing data-productId or data-cartId on edit icon or parent."
+        );
+        return;
+      }
+
+      const newQuantityStr = prompt(
+        `Enter new quantity for product ${productId}:`
+      );
+
+      if (newQuantityStr === null || newQuantityStr.trim() === "") return;
+
+      const newQuantity = parseInt(newQuantityStr);
+
+      if (isNaN(newQuantity) || newQuantity <= 0) {
+        alert("Please enter a valid positive number for quantity.");
+        return;
+      }
+
+      try {
+        const result = await updateProductQuantityInCart(
+          cartId,
+          productId,
+          newQuantity
+        );
+
+        if (result.success) {
+          alert(`Quantity updated successfully to ${newQuantity}!`);
+          window.location.reload();
+        } else {
+          alert(`Failed to update quantity: ${result.message}`);
+        }
+      } catch (error) {
+        console.error("Error updating product quantity:", error);
+        alert(
+          "An unexpected error occurred while updating quantity. Please try again."
+        );
+      }
+    });
+  });
+};
+
 // --- Init ---
 document.addEventListener("DOMContentLoaded", () => {
   setupAddToCartButtons();
   setupRemoveFromCartButtons();
+  setupEditQuantityButtons();
 });
