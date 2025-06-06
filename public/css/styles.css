@@ -201,11 +201,24 @@ header {
   flex-shrink: 0;
 }
 
+.cart-item-quantity-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .cart-item-quantity {
   font-size: 1rem;
   font-weight: 500;
   margin-bottom: 0.8rem;
   color: #444;
+}
+
+.cart-item-edit-icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 .remove-from-cart {
