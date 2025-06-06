@@ -42,10 +42,31 @@
   {{/each}}
 </div>
 
-{{!-- <p>Page {{page}} de {{totalPages}}</p>
+<div class="pagination-container">
+  <div>
+    {{#if pageContext.hasPrevPage}}
+    
+      <a href="/products?page={{pageContext.prevPage}}">
+       <img
+          class="add-to-cart-icon"
+          src="/images/arrow-back.svg"
+          alt="arrow-back-svg"
+        />
+      </a>
+    {{/if}}
+  </div>
 
-<div>
-  {{#if hasNextPage}}
-    <a href="/users-view?page={{nextPage}}">Next</a>
-  {{/if}}
-</div> --}}
+  <p>Page {{pageContext.page}} of {{pageContext.totalPages}}</p>
+
+  <div>
+    {{#if pageContext.hasNextPage}}
+      <a href="/products?page={{pageContext.nextPage}}">
+        <img
+          class="add-to-cart-icon"
+          src="/images/arrow-next.svg"
+          alt="arrow-next-svg"
+        />
+      </a>
+    {{/if}}
+  </div>
+</div>

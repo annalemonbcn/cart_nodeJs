@@ -19,22 +19,6 @@ const fetchProducts = async (req) => {
   const parsedPage = parseInt(page) || 1;
   const parsedLimit = parseInt(limit) || 10;
 
-  if (!page && !limit) {
-    const products = await ProductModel.find(filter).sort(sortOption).lean();
-    return {
-      docs: products,
-      pageContext: {
-        totalPages: 1,
-        prevPage: null,
-        nextPage: null,
-        hasPrevPage: false,
-        hasNextPage: false,
-        prevLink: null,
-        nextLink: null,
-      },
-    };
-  }
-
   const options = {
     page: parsedPage,
     limit: parsedLimit,
@@ -42,8 +26,15 @@ const fetchProducts = async (req) => {
     sort: sortOption,
   };
 
-  const { docs, totalPages, prevPage, nextPage, hasPrevPage, hasNextPage } =
-    await ProductModel.paginate(filter, options);
+  const {
+    docs,
+    page: currentPage,
+    totalPages,
+    prevPage,
+    nextPage,
+    hasPrevPage,
+    hasNextPage,
+  } = await ProductModel.paginate(filter, options);
 
   const { prevLink, nextLink } = buildPaginationLinks(
     req,
@@ -57,8 +48,9 @@ const fetchProducts = async (req) => {
   );
 
   return {
-    docs: docs,
+    docs,
     pageContext: {
+      page: currentPage,
       totalPages,
       prevPage,
       nextPage,
