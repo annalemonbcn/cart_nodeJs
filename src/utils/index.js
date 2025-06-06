@@ -23,4 +23,6 @@ const buildPaginationLinks = (
   };
 };
 
-export { buildPaginationLinks };
+const MOCK_CART_ID = "6842b6c39f05988cddb609af";
+
+export { buildPaginationLinks, MOCK_CART_ID };

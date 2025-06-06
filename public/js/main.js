@@ -1,6 +1,8 @@
 const MOCK_CART_ID = "6842b6c39f05988cddb609af";
 const API_BASE_URL = "/api/carts";
 
+const navigateToCart = () => {};
+
 const addProductToCart = async (cartId, productId) => {
   if (!productId || !cartId) {
     throw new Error("Product ID or Cart ID is missing for adding to cart.");
