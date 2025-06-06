@@ -56,13 +56,13 @@ const addProductToCart = async (req, res) => {
       });
 
     const productInCart = cart.products.find(
-      ({ productId }) => productId.toString() === pid
+      ({ product }) => product.toString() === pid
     );
 
     if (productInCart) {
       productInCart.quantity += 1;
     } else {
-      cart.products.push({ productId: pid, quantity: 1 });
+      cart.products.push({ product: pid, quantity: 1 });
     }
 
     await cart.save();
@@ -107,7 +107,7 @@ const replaceProducts = async (req, res) => {
       payload: cart,
     });
   } catch (error) {
-    console.error("Error while addProductToCart:", error.message);
+    console.error("Error while replaceProducts:", error.message);
     res
       .status(500)
       .json({ status: "error", code: 500, message: error.message });
@@ -129,7 +129,7 @@ const updateProductQty = async (req, res) => {
       });
 
     const productInCart = cart.products.find(
-      ({ productId }) => productId.toString() === pid
+      ({ product }) => product.toString() === pid
     );
 
     if (!productInCart)
@@ -150,7 +150,7 @@ const updateProductQty = async (req, res) => {
       payload: cart,
     });
   } catch (error) {
-    console.error("Error while addProductToCart:", error.message);
+    console.error("Error while updateProductQty:", error.message);
     res
       .status(500)
       .json({ status: "error", code: 500, message: error.message });
@@ -176,7 +176,7 @@ const deleteCart = async (req, res) => {
       message: `Cart ${cid} has been successfully deleted`,
     });
   } catch (error) {
-    console.error("Error while addProductToCart:", error.message);
+    console.error("Error while deleteCart:", error.message);
     res
       .status(500)
       .json({ status: "error", code: 500, message: error.message });
@@ -197,7 +197,7 @@ const deleteProductFromCart = async (req, res) => {
       });
 
     const productInCart = cart.products.find(
-      ({ productId }) => productId.toString() === pid
+      ({ product }) => product.toString() === pid
     );
 
     if (!productInCart)
@@ -208,9 +208,8 @@ const deleteProductFromCart = async (req, res) => {
       });
 
     cart.products = cart.products.filter(
-      ({ productId }) => productId.toString() !== pid
+      ({ product }) => product.toString() !== pid
     );
-    console.log("cart.products", cart.products);
 
     await cart.save();
 
@@ -221,7 +220,7 @@ const deleteProductFromCart = async (req, res) => {
       payload: cart,
     });
   } catch (error) {
-    console.error("Error while addProductToCart:", error.message);
+    console.error("Error while deleteProductFromCart:", error.message);
     res
       .status(500)
       .json({ status: "error", code: 500, message: error.message });
