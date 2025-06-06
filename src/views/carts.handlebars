@@ -1,0 +1,37 @@
+<h1>Cart Summary</h1>
+
+<div class="cart-summary-container">
+
+  {{#if cart.products.length}}
+    <div class="cart-items">
+      {{#each cart.products}}
+        <div class="cart-item">
+          <img
+            class="cart-product-image"
+            src="{{this.product.thumbnails.0.url}}"
+            alt="{{this.product.title}}"
+          />
+
+          <div class="cart-item-details">
+            <h2 class="cart-item-title">{{this.product.title}}</h2>
+            <p class="cart-item-description">{{this.product.description}}</p>
+            <p class="cart-item-price">Price: €{{this.product.price}}</p>
+          </div>
+
+          <div class="cart-item-actions">
+            <p class="cart-item-quantity">Quantity: {{this.quantity}}</p>
+            <a href="#" class="remove-from-cart" data-product-id="{{this._id}}">Remove from cart</a>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+    <div class="cart-total">
+      <p>Total: €{{cart.total}}</p>
+    </div>
+
+  {{else}}
+    <p class="cart-empty-message">Your cart is empty.</p>
+  {{/if}}
+
+</div>

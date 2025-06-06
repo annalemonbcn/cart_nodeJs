@@ -1,4 +1,5 @@
 import CartModel from "../models/cart.model.js";
+import { cartServices } from "../services/carts.services.js";
 
 const createCart = async (req, res) => {
   const cart = req.body;
@@ -20,9 +21,10 @@ const createCart = async (req, res) => {
 };
 
 const getCartById = async (req, res) => {
-  const { cid } = req.params;
+  const { getProductsByCartId } = cartServices;
+
   try {
-    const cart = await CartModel.findById(cid).populate("products.productId");
+    const cart = await getProductsByCartId(req);
 
     if (!cart)
       return res.status(404).json({

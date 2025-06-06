@@ -1,0 +1,51 @@
+<header>
+  <a href="/carts/{{cartId}}">View cart</a>
+</header>
+
+<h1>Products</h1>
+
+<div class="product-grid">
+  {{#each products}}
+    <div class="product-card">
+      <img
+        class="product-image"
+        src="{{this.thumbnails.0.url}}"
+        alt="{{this.title}}"
+      />
+
+      <h2 class="product-title">{{this.title}}</h2>
+
+      <p class="product-description">{{this.description}}</p>
+
+      <p class="product-code">{{this.code}}</p>
+
+      <p class="product-category">Category: {{this.category}}</p>
+
+      <p class="product-stock">Stock: {{this.stock}}</p>
+
+      <div class="product-footer">
+        <p class="product-price">€{{this.price}}</p>
+        <span class="product-status {{this.status}}">
+          {{#if (eq this.status "in_stock")}}In Stock{{else}}Out of Stock{{/if}}
+        </span>
+      </div>
+
+      <div class="product-add-to-cart {{#unless (eq this.status "in_stock")}}disabled-button{{/unless}}" data-product-id="{{this._id}}">
+        <img
+          class="add-to-cart-icon"
+          src="/images/shopping-cart-outline.svg"
+          alt="add-to-cart-icon"
+        />
+        Add to cart
+      </div>
+    </div>
+  {{/each}}
+</div>
+
+{{!-- <p>Page {{page}} de {{totalPages}}</p>
+
+<div>
+  {{#if hasNextPage}}
+    <a href="/users-view?page={{nextPage}}">Next</a>
+  {{/if}}
+</div> --}}
