@@ -1,83 +1,25 @@
 import ProductModel from "../models/product.model.js";
-import { buildPaginationLinks } from "../utils/index.js";
+import { productServices } from "../services/products.services.js";
 
 const getAllProducts = async (req, res) => {
+  const { fetchProducts } = productServices;
+
   try {
-    const { page, limit, query, sort } = req.query;
-
-    let filter = {};
-    if (query) {
-      const [key, value] = query.split(":");
-      if (["category", "status"].includes(key)) {
-        filter[key] = value;
-      }
-    }
-
-    let sortOption = {};
-    if (sort === "asc") sortOption.price = 1;
-    else if (sort === "desc") sortOption.price = -1;
-
-    const parsedPage = parseInt(page) || 1;
-    const parsedLimit = parseInt(limit) || 10;
-
-    if (!page && !limit) {
-      const products = await ProductModel.find(filter).sort(sortOption).lean();
-      return res.status(200).json({
-        status: "success",
-        code: 200,
-        payload: products,
-        pageContext: {
-          totalPages: 1,
-          prevPage: null,
-          nextPage: null,
-          hasPrevPage: false,
-          hasNextPage: false,
-          prevLink: null,
-          nextLink: null,
-        },
-      });
-    }
-
-    const options = {
-      page: parsedPage,
-      limit: parsedLimit,
-      lean: true,
-      sort: sortOption,
-    };
-
-    const result = await ProductModel.paginate(filter, options);
-    const { totalPages, prevPage, nextPage, hasPrevPage, hasNextPage } = result;
-
-    const { prevLink, nextLink } = buildPaginationLinks(
-      req,
-      query,
-      sort,
-      parsedLimit,
-      prevPage,
-      nextPage,
-      hasPrevPage,
-      hasNextPage
-    );
+    const { docs, pageContext } = await fetchProducts(req);
 
     res.status(200).json({
       status: "success",
       code: 200,
-      payload: result,
-      pageContext: {
-        totalPages,
-        prevPage,
-        nextPage,
-        hasPrevPage,
-        hasNextPage,
-        prevLink,
-        nextLink,
-      },
+      payload: docs,
+      pageContext,
     });
   } catch (error) {
     console.error("Error while getAllProducts:", error.message);
-    res
-      .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: error.message,
+    });
   }
 };
 

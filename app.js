@@ -19,8 +19,18 @@ const app = express();
 const PORT = process.env.MONGO_PORT;
 
 app.use(express.json());
+app.use(express.static("public"));
 
-app.engine("handlebars", engine());
+const hbsHelpers = {
+  eq: (a, b) => a === b,
+};
+
+app.engine(
+  "handlebars",
+  engine({
+    helpers: hbsHelpers,
+  })
+);
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "src", "views"));
 
