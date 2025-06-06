@@ -125,6 +125,15 @@ header {
   height: auto;
 }
 
+/* Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
 /* General container for the cart summary view */
 .cart-summary-container {
   width: 90%;
