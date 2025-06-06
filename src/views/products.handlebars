@@ -25,6 +25,15 @@
           {{#if (eq this.status "in_stock")}}In Stock{{else}}Out of Stock{{/if}}
         </span>
       </div>
+
+      <div class="product-add-to-cart {{#unless (eq this.status "in_stock")}}disabled-button{{/unless}}" data-product-id="{{this._id}}">
+        <img
+          class="add-to-cart-icon"
+          src="/images/shopping-cart-outline.svg"
+          alt="add-to-cart-icon"
+        />
+        Add to cart
+      </div>
     </div>
   {{/each}}
 </div>
