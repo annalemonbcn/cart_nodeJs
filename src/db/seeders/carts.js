@@ -1,31 +1,30 @@
-import { faker } from "@faker-js/faker";
 import CartModel from "../models/cart.model.js";
-import { connectToDatabase, disconnectFromDatabase } from "../config/db.js";
+import { connectToDatabase, disconnectFromDatabase } from "../config/index.js";
 
 await connectToDatabase();
 
 const carts = [];
 const cart1 = {
   products: [
-    { product: "684140f1d24a9453832e6f7c", quantity: 2 },
-    { product: "684140f1d24a9453832e6f7e", quantity: 1 },
-    { product: "684140f1d24a9453832e6f80", quantity: 5 },
+    { product: "685182032027309eda91170f", quantity: 2 },
+    { product: "685182032027309eda91170f", quantity: 1 },
+    { product: "685182032027309eda911711", quantity: 5 },
   ],
 };
 
 const cart2 = {
-  products: [{ product: "684140f1d24a9453832e6f82", quantity: 8 }],
+  products: [{ product: "685182032027309eda911711", quantity: 8 }],
 };
 
 const cart3 = {
   products: [
-    { product: "684140f1d24a9453832e6f84", quantity: 3 },
-    { product: "684140f1d24a9453832e6f86", quantity: 4 },
+    { product: "685182032027309eda911713", quantity: 3 },
+    { product: "685182032027309eda911713", quantity: 4 },
   ],
 };
 
 carts.push(cart3);
 
 CartModel.insertMany([cart1, cart2, cart3])
-  .then(() => console.log("Cart added"))
+  .then(() => console.log("Carts added"))
   .then(async () => await disconnectFromDatabase());
