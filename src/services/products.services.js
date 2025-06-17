@@ -1,7 +1,7 @@
 import ProductModel from "../db/models/product.model.js";
 import { buildPaginationLinks } from "../helpers/index.js";
 
-const fetchProducts = async (req) => {
+const fetchProductsService = async (req) => {
   const { page, limit, query, sort } = req.query;
 
   let filter = {};
@@ -62,8 +62,60 @@ const fetchProducts = async (req) => {
   };
 };
 
+const getProductByIdService = async (pid) => {
+  try {
+    const product = await ProductModel.findById(pid).lean();
+    if (!product) return null;
+
+    return product;
+  } catch (error) {
+    throw new Error(`Error getting product by id: ` + error.message);
+  }
+};
+
+const createProductService = async (product) => {
+  try {
+    const newProduct = await ProductModel.create(product);
+    return newProduct;
+  } catch (error) {
+    throw new Error(`Error creating a product: ` + error.message);
+  }
+};
+
+const updateProductService = async (pid, fieldsToUpdate) => {
+  try {
+    const options = { new: true, runValidators: true };
+    const updatedproduct = await ProductModel.findByIdAndUpdate(
+      pid,
+      fieldsToUpdate,
+      options
+    );
+
+    if (!updatedproduct) return null;
+
+    return updatedproduct;
+  } catch (error) {
+    throw new Error(`Error updating product ${pid}: ` + error.message);
+  }
+};
+
+const deleteProductService = async (pid) => {
+  try {
+    const deletedProduct = await ProductModel.findByIdAndDelete(pid);
+    if (!deletedProduct) return null;
+
+    return deletedProduct;
+  } catch (error) {
+    throw new Error(`Error deleting product ${pid}: ` + error.message);
+  }
+};
+
 const productServices = {
-  fetchProducts,
+  fetchProductsService,
+  getProductByIdService,
+  createProductService,
+  updateProductService,
+  deleteProductService,
 };
 
 export { productServices };
