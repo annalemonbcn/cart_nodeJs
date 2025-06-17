@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { productServices } from "../services/products.services.js";
 import { cartServices } from "../services/carts.services.js";
-import { MOCK_CART_ID } from "../utils/index.js";
+import { MOCK_CART_ID } from "../helpers/index.js";
 
 const router = Router();
 
-// TODO: ??
 router.get("/products", async (req, res) => {
   const { fetchProducts } = productServices;
 

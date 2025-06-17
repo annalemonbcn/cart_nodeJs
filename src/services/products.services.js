@@ -1,5 +1,5 @@
-import ProductModel from "../models/product.model.js";
-import { buildPaginationLinks } from "../utils/index.js";
+import ProductModel from "../db/models/product.model.js";
+import { buildPaginationLinks } from "../helpers/index.js";
 
 const fetchProducts = async (req) => {
   const { page, limit, query, sort } = req.query;

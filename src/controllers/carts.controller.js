@@ -1,4 +1,4 @@
-import CartModel from "../models/cart.model.js";
+import CartModel from "../db/models/cart.model.js";
 import { cartServices } from "../services/carts.services.js";
 
 const createCart = async (req, res) => {
