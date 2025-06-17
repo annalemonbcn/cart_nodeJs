@@ -9,7 +9,7 @@ Backend for shopping cart management, built with **Node.js**, **Express**, **Mon
 3. [Startup](#-startup)
 4. [Environment Variables](#-environment-variables)
 5. [Project Structure](#-project-structure)
-6. [Seeding]
+6. [Seeding](#-seeding)
 7. [Endpoints](#-endpoints)
 8. [Models](#-models)
 9. [Live API](#-live-api)
