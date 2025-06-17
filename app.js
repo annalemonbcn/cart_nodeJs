@@ -1,34 +1,48 @@
-const express = require("express");
-const handlebars = require("express-handlebars");
-const path = require("path");
+import express from "express";
+import { engine } from "express-handlebars";
+import path, { dirname, join } from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
-const productsRoutes = require("./src/routes/products.routes");
-const cartsRoutes = require("./src/routes/carts.routes");
-const viewsRoutes = require("./src/routes/views.routes");
+import { connectToDatabase } from "./src/config/db.js";
 
-const PORT = 8080;
+import productsRoutes from "./src/routes/products.routes.js";
+import cartsRoutes from "./src/routes/carts.routes.js";
+import viewsRoutes from "./src/routes/views.routes.js";
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
+const PORT = process.env.MONGO_PORT;
 
-app.engine("handlebars", handlebars.engine());
+app.use(express.json());
+app.use(express.static("public"));
+
+const hbsHelpers = {
+  eq: (a, b) => a === b,
+};
+
+app.engine(
+  "handlebars",
+  engine({
+    helpers: hbsHelpers,
+  })
+);
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "src", "views"));
 
-app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/products", productsRoutes);
 app.use("/api/carts", cartsRoutes);
 app.use("/", viewsRoutes);
 
-const http = require("http").createServer(app);
+const startServer = async () => {
+  await connectToDatabase();
+  app.listen(PORT, () =>
+    console.log(`🚀 Server running on http://localhost:${PORT}`)
+  );
+};
 
-const { Server } = require("socket.io");
-const io = new Server(http);
-
-io.on("connection", (socket) => {
-  console.log("connected");
-
-  // socket.on("message", (data) => {
-  //   console.log("data", data);
-  // });
-});
-
-http.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+startServer();

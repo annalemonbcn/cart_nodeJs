@@ -1,74 +1,131 @@
-const path = require("path");
-const ProductsManager = require("../managers/products.manager");
+import ProductModel from "../models/product.model.js";
+import { productServices } from "../services/products.services.js";
 
-const productsFilePath = path.join(__dirname, "..", "data", "products.json");
+const getAllProducts = async (req, res) => {
+  const { fetchProducts } = productServices;
 
-const pm = new ProductsManager(productsFilePath);
-
-exports.getAllProducts = async (req, res) => {
-  const products = await pm.getProducts();
-  res.status(200).json({ status: "success", code: 200, data: products });
-};
-
-exports.getProductById = async (req, res) => {
-  const { pid } = req.params;
-  const product = await pm.getProductById(pid);
-  if (!product)
-    return res.status(404).json({
-      status: "error",
-      code: 404,
-      message: `Product with id ${pid} doesn't exist`,
-    });
-
-  res.status(200).json({ status: "success", code: 200, data: product });
-};
-
-exports.createProduct = async (req, res) => {
-  const product = req.body;
   try {
-    await pm.addProduct(product);
-    res.status(201).json({
+    const { docs, pageContext } = await fetchProducts(req);
+
+    res.status(200).json({
       status: "success",
-      code: 201,
-      message: "Product created",
-      data: product,
+      code: 200,
+      payload: docs,
+      pageContext,
     });
   } catch (error) {
-    res
-      .status(400)
-      .json({ status: "error", code: 400, message: error.message });
+    console.error("Error while getAllProducts:", error.message);
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: error.message,
+    });
   }
 };
 
-exports.updateProduct = async (req, res) => {
+const getProductById = async (req, res) => {
+  const { pid } = req.params;
+
+  try {
+    const product = await ProductModel.findById(pid).lean();
+
+    if (!product)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Product with id ${pid} doesn't exist`,
+      });
+
+    res.status(200).json({ status: "success", code: 200, payload: product });
+  } catch (error) {
+    console.error("Error while getProductById:", error.message);
+    res
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
+  }
+};
+
+const createProduct = async (req, res) => {
+  const product = req.body;
+
+  try {
+    const newProduct = await ProductModel.create(product);
+    res.status(201).json({
+      status: "success",
+      code: 201,
+      message: "Product successfully created",
+      payload: newProduct,
+    });
+  } catch (error) {
+    console.error("Error while createProduct:", error.message);
+    res
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
+  }
+};
+
+const updateProduct = async (req, res) => {
   const { pid } = req.params;
   const fieldsToUpdate = req.body;
+
   try {
-    await pm.updateProduct(pid, fieldsToUpdate);
+    const updated = await ProductModel.findByIdAndUpdate(pid, fieldsToUpdate, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Product with id ${pid} doesn't exist`,
+      });
+
     res.status(200).json({
       status: "success",
       code: 200,
       message: "Product updated successfully",
+      payload: updated,
     });
   } catch (error) {
+    console.error("Error while updateProduct:", error.message);
     res
-      .status(400)
-      .json({ status: "error", code: 400, message: error.message });
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
   }
 };
 
-exports.deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res) => {
   const { pid } = req.params;
+
   try {
-    await pm.deleteProduct(pid);
+    const deleted = await ProductModel.findByIdAndDelete(pid);
+
+    if (!deleted)
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Product with id ${pid} doesn't exist`,
+      });
+
     res.status(200).json({
       status: "success",
       code: 200,
       message: "Product deleted successfully",
+      payload: deleted,
     });
   } catch (error) {
+    console.error("Error while deleteProduct:", error.message);
     res
-      .status(400)
-      .json({ status: "error", code: 400, message: error.message });
+      .status(500)
+      .json({ status: "error", code: 500, message: error.message });
   }
+};
+
+export {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 };
