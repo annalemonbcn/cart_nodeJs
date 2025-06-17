@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import ProductModel from "../models/product.model.js";
-import { connectToDatabase, disconnectFromDatabase } from "../config/db.js";
+import { connectToDatabase, disconnectFromDatabase } from "../config/index.js";
 
 await connectToDatabase();
 
