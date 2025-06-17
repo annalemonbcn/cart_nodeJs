@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  title: Cart API
+  version: 1.0.0
+  description: REST API to manage products and carts
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://cartnodejs-production.up.railway.app/
+    description: Railway deployment
+
+tags:
+  - name: Products
+    description: Product management endpoints
+  - name: Carts
+    description: Cart management endpoints
+
+paths:
+  /api/products:
+    get:
+      tags:
+        - Products
+      summary: Get all products
+      description: Returns a paginated list of products
+      responses:
+        '200':
+          description: A list of products
+    post:
+      tags:
+        - Products      
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+
+  /api/products/{id}:
+    get:
+      tags:
+        - Products      
+      summary: Get product by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Product found
+        '404':
+          description: Product not found
+    put:
+      tags:
+        - Products      
+      summary: Update product by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Product updated
+    delete:
+      tags:
+        - Products      
+      summary: Delete product by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Product deleted
+
+  /api/carts:
+    get:
+      tags:
+        - Carts      
+      summary: Get all carts
+      responses:
+        '200':
+          description: A list of carts
+    post:
+      tags:
+        - Carts      
+      summary: Create a new cart
+      responses:
+        '201':
+          description: Cart created
+
+  /api/carts/{id}:
+    get:
+      tags:
+        - Carts      
+      summary: Get cart by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Cart found
+        '404':
+          description: Cart not found
+    put:
+      tags:
+        - Carts      
+      summary: Update cart by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cart'
+      responses:
+        '200':
+          description: Cart updated
+    delete:
+      tags:
+        - Carts      
+      summary: Delete cart by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Cart deleted
+
+  /api/carts/{id}/products:
+    post:
+      tags:
+        - Carts      
+      summary: Add a product to cart
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: Product added to cart
+
+  /api/carts/{id}/products/{prodId}:
+    delete:
+      tags:
+        - Carts      
+      summary: Remove product from cart
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: prodId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Product removed from cart
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - title
+        - description
+        - price
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        category:
+          type: string
+
+    Cart:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: string
+              quantity:
+                type: integer
