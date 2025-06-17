@@ -59,7 +59,6 @@ Create a `.env` file in the root with these variables:
 ```
 MONGODB_URI=mongodb://localhost:27017/cartDB
 MONGO_PORT=8080
-```
 
 ---
 
@@ -146,7 +145,6 @@ You can also access it online at:
 ```
 https://cartnodejs-production.up.railway.app/api-docs
 ```
-
 
 ---
 
