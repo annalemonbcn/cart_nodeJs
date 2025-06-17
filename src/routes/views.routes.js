@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { productServices } from "../services/products.services.js";
 import { cartServices } from "../services/carts.services.js";
-import { MOCK_CART_ID } from "../utils/index.js";
+import { MOCK_CART_ID } from "../helpers/index.js";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get("/products", async (req, res) => {
     const { docs, pageContext } = await fetchProducts(req);
     const cartId = MOCK_CART_ID;
 
-    res.render("products", { products: docs, cartId, pageContext });
+    res.json({ products: docs, cartId, pageContext });
   } catch (error) {
     console.error("Error while loading products:", error.message);
     res.status(500).json({
@@ -29,7 +29,7 @@ router.get("/carts/:cid", async (req, res) => {
   try {
     const cart = await getProductsByCartId(req);
 
-    res.render("carts", { cart });
+    res.json({ cart });
   } catch (error) {
     console.error("Error while loading cart:", error.message);
     res.status(500).json({

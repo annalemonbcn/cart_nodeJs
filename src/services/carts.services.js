@@ -1,4 +1,4 @@
-import CartModel from "../models/cart.model.js";
+import CartModel from "../db/models/cart.model.js";
 
 const getProductsByCartId = async (req) => {
   const { cid } = req.params;
