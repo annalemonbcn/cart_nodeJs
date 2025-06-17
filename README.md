@@ -27,7 +27,7 @@ This project provides a RESTful backend for managing a shopping cart. It allows 
 
 - [Node.js](https://nodejs.org/)  
 - [Express](https://expressjs.com/)  
-- [MongoDB](https://www.mongodb.com/)  
+- [MongoDB](https://www.mongodb.com/) 
 - [Mongoose](https://mongoosejs.com/)
 - [Swagger](https://swagger.io/tools/swagger-ui/)
 - [Nodemon](https://github.com/remy/nodemon) (for development)
