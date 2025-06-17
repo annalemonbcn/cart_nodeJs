@@ -1,6 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express"
+import YAML from "yamljs";
+
+const swaggerDocument = YAML.load('./swagger.yaml'); 
 
 import { connectToDatabase } from "./db/config/index.js";
 
@@ -16,6 +20,7 @@ const PORT = process.env.MONGO_PORT;
 app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/products", productsRoutes);
 app.use("/api/carts", cartsRoutes);

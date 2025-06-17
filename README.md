@@ -12,7 +12,8 @@ Backend for shopping cart management, built with **Node.js**, **Express**, **Mon
 6. [Seeding](#-seeding)
 7. [Endpoints](#-endpoints)
 8. [Models](#-models)
-9. [Live API](#-live-api)
+9. [API Documentation](#-api-documentation)
+10. [Live API](#-live-api)
 
 ---
 
@@ -26,8 +27,9 @@ This project provides a RESTful backend for managing a shopping cart. It allows 
 
 - [Node.js](https://nodejs.org/)  
 - [Express](https://expressjs.com/)  
-- [MongoDB](https://www.mongodb.com/)  
-- [Mongoose](https://mongoosejs.com/)  
+- [MongoDB](https://www.mongodb.com/) 
+- [Mongoose](https://mongoosejs.com/)
+- [Swagger](https://swagger.io/tools/swagger-ui/)
 - [Nodemon](https://github.com/remy/nodemon) (for development)
 - [Faker](https://fakerjs.dev/) (for development)
 
@@ -56,8 +58,7 @@ Create a `.env` file in the root with these variables:
 
 ```
 MONGODB_URI=mongodb://localhost:27017/cartDB
-MONGO_PORT=3000
-```
+MONGO_PORT=8080
 
 ---
 
@@ -126,6 +127,24 @@ node src/db/seeders/carts.js
 
 - **Cart**  
   Array of products, having `{ product: ObjectId, quantity: Number }`.
+
+---
+
+## 📚 API Documentation
+
+Interactive API documentation is available at:
+
+```
+http://localhost:8080/api-docs
+```
+
+It is automatically generated using **Swagger UI** and provides a complete overview of all available endpoints.
+
+You can also access it online at:
+
+```
+https://cartnodejs-production.up.railway.app/api-docs
+```
 
 ---
 
