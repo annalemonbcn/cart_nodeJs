@@ -54,11 +54,15 @@ npm install
 
 ## 🔑 Environment Variables
 
-Create a `.env` file in the root with these variables:
+Create a `.env` file in the root directory and add the following variables:
 
+```env
+MONGODB_URI=your_mongodb_connection_string
+PORT=8080
 ```
-MONGODB_URI=mongodb://localhost:27017/cartDB
-MONGO_PORT=8080
+
+- Replace `your_mongodb_connection_string` with your actual MongoDB URI (local or remote).
+- `PORT` is the port your Express server will run on (default: 8080).
 
 ---
 
