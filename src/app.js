@@ -15,7 +15,7 @@ import viewsRoutes from "./routes/views.routes.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.MONGO_PORT;
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
