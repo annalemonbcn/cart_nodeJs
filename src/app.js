@@ -3,14 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express"
 import YAML from "yamljs";
-
-const swaggerDocument = YAML.load('./swagger.yaml'); 
-
+const swaggerDocument = YAML.load('./swagger.yaml');
 import { connectToDatabase } from "./db/config/index.js";
-
-import productsRoutes from "./routes/products.routes.js";
-import cartsRoutes from "./routes/carts.routes.js";
-import viewsRoutes from "./routes/views.routes.js";
+import router from "./routes/index.js";
 
 dotenv.config();
 
@@ -22,9 +17,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use("/api/products", productsRoutes);
-app.use("/api/carts", cartsRoutes);
-app.use("/", viewsRoutes);
+app.use(router);
 
 const startServer = async () => {
   await connectToDatabase();
@@ -34,3 +27,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export default app;
