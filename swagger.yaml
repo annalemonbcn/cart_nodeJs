@@ -4,11 +4,11 @@ info:
   version: 1.0.0
   description: REST API to manage products and carts
 
-# servers:
-#   - url: http://localhost:8080
-#     description: Local development
-#   - url: https://cartnodejs-production.up.railway.app/
-#     description: Railway deployment
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://cartnodejs-production.up.railway.app/
+    description: Railway deployment
 
 tags:
   - name: Products
