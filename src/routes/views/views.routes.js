@@ -35,7 +35,7 @@ router.get("/carts/:cid", async (req, res) => {
     res.status(500).json({
       status: "error",
       code: 500,
-      message: "Error while loading cart",
+      message: "Internal server error",
     });
   }
 });

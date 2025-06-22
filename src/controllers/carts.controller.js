@@ -30,7 +30,7 @@ const createCart = async (req, res) => {
 
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: "Error in createCart" });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -62,7 +62,7 @@ const getCartById = async (req, res) => {
 
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: "Error in getCartById" });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -101,7 +101,7 @@ const addProductToCart = async (req, res) => {
       .json({
         status: "error",
         code: 500,
-        message: "Error in addProductToCart",
+        message: "Internal server error",
       });
   }
 };
@@ -141,7 +141,7 @@ const replaceProducts = async (req, res) => {
       .json({
         status: "error",
         code: 500,
-        message: "Error in replaceProducts",
+        message: "Internal server error",
       });
   }
 };
@@ -176,7 +176,7 @@ const updateProductQty = async (req, res) => {
       .json({
         status: "error",
         code: statusCode,
-        message: "Error in updateProductQty",
+        message: "Internal server error",
       });
   }
 };
@@ -210,7 +210,7 @@ const deleteCart = async (req, res) => {
     console.error("Error in deleteCart:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: "Error in deleteCart" });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -243,7 +243,7 @@ const deleteProductFromCart = async (req, res) => {
       .json({
         status: "error",
         code: statusCode,
-        message: "Error in deleteProductFromCart",
+        message: "Internal server error",
       });
   }
 };
