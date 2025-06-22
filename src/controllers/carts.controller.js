@@ -30,7 +30,7 @@ const createCart = async (req, res) => {
 
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Error in createCart" });
   }
 };
 
@@ -62,7 +62,7 @@ const getCartById = async (req, res) => {
 
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Error in getCartById" });
   }
 };
 
@@ -98,7 +98,11 @@ const addProductToCart = async (req, res) => {
 
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({
+        status: "error",
+        code: 500,
+        message: "Error in addProductToCart",
+      });
   }
 };
 
@@ -134,7 +138,11 @@ const replaceProducts = async (req, res) => {
     console.error("Error in replaceProducts:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({
+        status: "error",
+        code: 500,
+        message: "Error in replaceProducts",
+      });
   }
 };
 
@@ -165,7 +173,11 @@ const updateProductQty = async (req, res) => {
 
     return res
       .status(statusCode)
-      .json({ status: "error", code: statusCode, message: error.message });
+      .json({
+        status: "error",
+        code: statusCode,
+        message: "Error in updateProductQty",
+      });
   }
 };
 
@@ -198,7 +210,7 @@ const deleteCart = async (req, res) => {
     console.error("Error in deleteCart:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Error in deleteCart" });
   }
 };
 
@@ -228,7 +240,11 @@ const deleteProductFromCart = async (req, res) => {
 
     return res
       .status(statusCode)
-      .json({ status: "error", code: statusCode, message: error.message });
+      .json({
+        status: "error",
+        code: statusCode,
+        message: "Error in deleteProductFromCart",
+      });
   }
 };
 
