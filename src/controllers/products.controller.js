@@ -24,7 +24,7 @@ const getAllProducts = async (req, res) => {
     return res.status(500).json({
       status: "error",
       code: 500,
-      message: error.message,
+      message: "Internal server error",
     });
   }
 };
@@ -56,7 +56,7 @@ const getProductById = async (req, res) => {
     console.error("Error in getProductById:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -83,7 +83,7 @@ const createProduct = async (req, res) => {
     console.error("Error in createProduct:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -118,7 +118,7 @@ const updateProduct = async (req, res) => {
     console.error("Error in updateProduct:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
@@ -152,7 +152,7 @@ const deleteProduct = async (req, res) => {
     console.error("Error in deleteProduct:", error.message);
     return res
       .status(500)
-      .json({ status: "error", code: 500, message: error.message });
+      .json({ status: "error", code: 500, message: "Internal server error" });
   }
 };
 
