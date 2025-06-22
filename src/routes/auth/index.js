@@ -1,126 +1,42 @@
 import { Router } from "express";
-import bcrypt from "bcrypt";
-import UserModel from "../../db/models/user.model.js";
+import passport from "passport";
 
 const router = Router();
 
-const validateEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+router.post("/register", (req, res, next) => {
+  passport.authenticate("register", { session: false }, (error, user, info) => {
+    if (error) return next(error);
 
-  return emailRegex.test(email);
-};
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: "error", code: 400, message: info.message });
+    }
 
-const validateUniqueEmail = async (email) => {
-  const existingUser = await UserModel.findOne({ email });
-  return !existingUser;
-};
-
-const validateStrongPassword = (password) => {
-  const passwordRegex =
-    /^(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?`~])[A-Za-z\d!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?`~]{8,}$/;
-
-  return passwordRegex.test(password);
-};
-
-router.post("/register", async (req, res) => {
-  let { firstName, lastName, email, password } = req.body;
-
-  /** Validations */
-  if (!firstName || !lastName || !email || !password)
-    return res
-      .status(400)
-      .send({ status: "error", code: 400, message: "All fields are required" });
-
-  // validate: valid email (contains @ or similar)
-  if (!validateEmail(email))
-    return res
-      .status(400)
-      .send({ status: "error", code: 400, message: "Invalid email format" });
-
-  // validate: unique email (find in db)
-  const isUnique = await validateUniqueEmail(email);
-  if (!isUnique)
-    return res
-      .status(409)
-      .send({ status: "error", code: 409, message: "Email already in use" });
-
-  // validate: strong password
-  if (!validateStrongPassword(password))
-    return res.status(400).send({
-      status: "error",
-      code: 400,
-      message:
-        "Password must be at least 8 characters, include one uppercase letter and one special character",
-    });
-
-  try {
-    const user = await UserModel.create({
-      firstName,
-      lastName,
-      email,
-      password: bcrypt.hashSync(password, 10),
-    });
-
-    const userObj = user.toObject(); // -> toObject() is used to convert a plain object instead of a mongoose document
+    const userObj = user.toObject();
     delete userObj.password;
     delete userObj.createdAt;
     delete userObj.updatedAt;
 
-    // Remove sensible data
-    return res.status(201).send({
+    return res.status(201).json({
       status: "success",
       code: 201,
       message: "User successfully created",
       payload: userObj,
     });
-  } catch (error) {
-    console.error("Error in register:", error.message);
-    return res
-      .status(500)
-      .send({ status: "error", code: 500, message: "Internal server error" });
-  }
+  })(req, res, next);
 });
 
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+router.post("/login", (req, res, next) => {
+  passport.authenticate("login", { session: false }, (error, user, info) => {
+    if (error) return next(error);
 
-  /** Validations */
-  if (!email || !password)
-    return res
-      .status(400)
-      .send({ status: "error", code: 400, message: "All fields are required" });
-
-  // validate: valid email (contains @ or similar)
-  if (!validateEmail(email))
-    return res
-      .status(400)
-      .send({ status: "error", code: 400, message: "Invalid email format" });
-
-  // validate: strong password
-  if (!validateStrongPassword(password))
-    return res.status(400).send({
-      status: "error",
-      code: 400,
-      message:
-        "Password must be at least 8 characters, include one uppercase letter and one special character",
-    });
-
-  try {
-    const user = await UserModel.findOne({ email }).lean(); // -> lean is used to return a plain object, not a mongoose document
-
-    // Validate: user exists in db
-    if (!user)
+    if (!user) {
       return res
         .status(401)
-        .send({ status: "error", code: 401, message: "Unauthorized" });
+        .json({ status: "error", code: 401, message: info.message });
+    }
 
-    // Validate: email matches password hash
-    if (!bcrypt.compareSync(password, user.password))
-      return res
-        .status(401)
-        .send({ status: "error", code: 401, message: "Unauthorized" });
-
-    // Remove sensible data
     delete user.password;
     delete user.createdAt;
     delete user.updatedAt;
@@ -131,12 +47,7 @@ router.post("/login", async (req, res) => {
       message: "User successfully logged in",
       payload: user, // -> return a JWT token, not user
     });
-  } catch (error) {
-    console.error("Error in login:", error.message);
-    return res
-      .status(500)
-      .send({ status: "error", code: 500, message: "Internal server error" });
-  }
+  })(req, res, next);
 });
 
 export default router;

@@ -3,8 +3,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express"
 import YAML from "yamljs";
+import passport from "passport";
 const swaggerDocument = YAML.load('./swagger.yaml');
-import { connectToDatabase } from "./db/config/index.js";
+import { startPassport } from "./config/passport/index.js";
+import { connectToDatabase } from "./config/db/index.js";
 import router from "./routes/index.js";
 
 dotenv.config();
@@ -16,6 +18,9 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+startPassport();
+app.use(passport.initialize());
 
 app.use(router);
 

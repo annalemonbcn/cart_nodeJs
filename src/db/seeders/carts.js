@@ -1,5 +1,5 @@
 import CartModel from "../models/cart.model.js";
-import { connectToDatabase, disconnectFromDatabase } from "../config/index.js";
+import { connectToDatabase, disconnectFromDatabase } from "../config/db/index.js";
 
 await connectToDatabase();
 
