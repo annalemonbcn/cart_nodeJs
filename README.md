@@ -147,7 +147,7 @@ It is automatically generated using **Swagger UI** and provides a complete overv
 You can also access it online at:
 
 ```
-[https://cartnodejs-production.up.railway.app/api-docs](https://cartnodejs-prod.up.railway.app/api-docs/)
+https://cartnodejs-prod.up.railway.app/api-docs
 ```
 
 ---
