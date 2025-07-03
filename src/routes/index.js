@@ -8,7 +8,7 @@ const router = Router();
 
 router.use("/api/products", productsRoutes);
 router.use("/api/carts", cartsRoutes);
-router.use("/", authRoutes);
+router.use("/api/auth", authRoutes);
 router.use("/", viewsRoutes);
 
 export default router;
