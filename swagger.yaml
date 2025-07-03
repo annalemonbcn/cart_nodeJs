@@ -348,10 +348,7 @@ components:
   schemas:
     Product:
       type: object
-      required:
-        - title
-        - description
-        - price
+      required: [title, description, price]
       properties:
         title:
           type: string
@@ -376,3 +373,18 @@ components:
                 type: string
               quantity:
                 type: integer
+
+    User:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8

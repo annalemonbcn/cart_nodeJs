@@ -3,6 +3,7 @@ import { productServices } from "../../services/products.services.js";
 import { cartServices } from "../../services/carts.services.js";
 import { MOCK_CART_ID } from "../../helpers/index.js";
 
+// TODO: delete in a future
 const router = Router();
 
 router.get("/products", async (req, res) => {
