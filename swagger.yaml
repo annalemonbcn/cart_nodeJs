@@ -362,7 +362,7 @@ paths:
   /api/users/me:
     get:
       tags:
-        - users
+        - Users
       summary: Get user profile
       responses:
         "200":

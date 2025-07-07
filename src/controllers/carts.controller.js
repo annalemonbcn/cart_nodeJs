@@ -1,5 +1,4 @@
-import CartModel from "../db/models/cart.model.js";
-import { cartServices } from "../services/carts.services.js";
+import { cartServices } from "#services/carts.services.js";
 
 const {
   createCartService,
@@ -96,13 +95,11 @@ const addProductToCart = async (req, res) => {
   } catch (error) {
     console.error("Error in addProductToCart:", error.message);
 
-    return res
-      .status(500)
-      .json({
-        status: "error",
-        code: 500,
-        message: "Internal server error",
-      });
+    return res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -136,13 +133,11 @@ const replaceProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in replaceProducts:", error.message);
-    return res
-      .status(500)
-      .json({
-        status: "error",
-        code: 500,
-        message: "Internal server error",
-      });
+    return res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -171,13 +166,11 @@ const updateProductQty = async (req, res) => {
 
     const statusCode = error.statusCode || 500;
 
-    return res
-      .status(statusCode)
-      .json({
-        status: "error",
-        code: statusCode,
-        message: "Internal server error",
-      });
+    return res.status(statusCode).json({
+      status: "error",
+      code: statusCode,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -238,13 +231,11 @@ const deleteProductFromCart = async (req, res) => {
 
     const statusCode = error.statusCode || 500;
 
-    return res
-      .status(statusCode)
-      .json({
-        status: "error",
-        code: statusCode,
-        message: "Internal server error",
-      });
+    return res.status(statusCode).json({
+      status: "error",
+      code: statusCode,
+      message: "Internal server error",
+    });
   }
 };
 

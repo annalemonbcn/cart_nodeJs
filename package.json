@@ -5,7 +5,12 @@
   "main": "index.js",
   "type": "module",
   "imports": {
-    "#routes/*": "./src/routes/*"
+    "#routes/*": "./src/routes/*",
+    "#controllers/*": "./src/controllers/*",
+    "#services/*": "./src/services/*",
+    "#models/*": "./src/db/models/*",
+    "#middlewares/*": "./src/middlewares/*",
+    "#constants": "./src/constants.js"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/app.js",

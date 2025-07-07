@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { productServices } from "../../services/products.services.js";
-import { cartServices } from "../../services/carts.services.js";
-import { MOCK_CART_ID } from "../../helpers/index.js";
+import { productServices } from "#services/products.services.js";
+import { cartServices } from "#services/carts.services.js";
+import { MOCK_CART_ID } from "#constants";
 
 // TODO: delete in a future
 const router = Router();

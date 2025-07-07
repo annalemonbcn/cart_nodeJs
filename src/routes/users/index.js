@@ -1,6 +1,6 @@
 import { Router } from "express";
-import UserModel from "../../db/models/user.model.js";
-import { auth } from "../../middlewares/auth/index.js";
+import UserModel from "#models/user.model.js";
+import { auth } from "#middlewares/auth/index.js";
 
 const router = Router();
 
