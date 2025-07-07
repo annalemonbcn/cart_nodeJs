@@ -2,19 +2,21 @@ openapi: 3.0.0
 info:
   title: Cart API
   version: 1.0.0
-  description: REST API to manage products and carts
+  description: REST API to manage products, carts and authentication
 
-servers:
-  - url: http://localhost:8080
-    description: Local development
-  - url: https://cartnodejs-production.up.railway.app/
-    description: Railway deployment
+# servers:
+#   - url: http://localhost:8080
+#     description: Local development
+#   - url: https://cartnodejs-production.up.railway.app/
+#     description: Railway deployment
 
 tags:
   - name: Products
     description: Product management endpoints
   - name: Carts
     description: Cart management endpoints
+  - name: Auth
+    description: Authentication endpoints
 
 paths:
   /api/products:
@@ -24,26 +26,26 @@ paths:
       summary: Get all products
       description: Returns a paginated list of products
       responses:
-        '200':
+        "200":
           description: A list of products
     post:
       tags:
-        - Products      
+        - Products
       summary: Create a new product
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: "#/components/schemas/Product"
       responses:
-        '201':
+        "201":
           description: Product created
 
   /api/products/{id}:
     get:
       tags:
-        - Products      
+        - Products
       summary: Get product by ID
       parameters:
         - in: path
@@ -52,13 +54,13 @@ paths:
             type: string
           required: true
       responses:
-        '200':
+        "200":
           description: Product found
-        '404':
+        "404":
           description: Product not found
     put:
       tags:
-        - Products      
+        - Products
       summary: Update product by ID
       parameters:
         - in: path
@@ -71,13 +73,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Product'
+              $ref: "#/components/schemas/Product"
       responses:
-        '200':
+        "200":
           description: Product updated
     delete:
       tags:
-        - Products      
+        - Products
       summary: Delete product by ID
       parameters:
         - in: path
@@ -86,29 +88,29 @@ paths:
             type: string
           required: true
       responses:
-        '200':
+        "200":
           description: Product deleted
 
   /api/carts:
     get:
       tags:
-        - Carts      
+        - Carts
       summary: Get all carts
       responses:
-        '200':
+        "200":
           description: A list of carts
     post:
       tags:
-        - Carts      
+        - Carts
       summary: Create a new cart
       responses:
-        '201':
+        "201":
           description: Cart created
 
   /api/carts/{id}:
     get:
       tags:
-        - Carts      
+        - Carts
       summary: Get cart by ID
       parameters:
         - in: path
@@ -117,13 +119,13 @@ paths:
             type: string
           required: true
       responses:
-        '200':
+        "200":
           description: Cart found
-        '404':
+        "404":
           description: Cart not found
     put:
       tags:
-        - Carts      
+        - Carts
       summary: Update cart by ID
       parameters:
         - in: path
@@ -135,13 +137,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Cart'
+              $ref: "#/components/schemas/Cart"
       responses:
-        '200':
+        "200":
           description: Cart updated
     delete:
       tags:
-        - Carts      
+        - Carts
       summary: Delete cart by ID
       parameters:
         - in: path
@@ -150,13 +152,13 @@ paths:
             type: string
           required: true
       responses:
-        '200':
+        "200":
           description: Cart deleted
 
   /api/carts/{id}/products:
     post:
       tags:
-        - Carts      
+        - Carts
       summary: Add a product to cart
       parameters:
         - in: path
@@ -176,13 +178,13 @@ paths:
                 quantity:
                   type: integer
       responses:
-        '200':
+        "200":
           description: Product added to cart
 
   /api/carts/{id}/products/{prodId}:
     delete:
       tags:
-        - Carts      
+        - Carts
       summary: Remove product from cart
       parameters:
         - in: path
@@ -196,17 +198,207 @@ paths:
             type: string
           required: true
       responses:
-        '200':
+        "200":
           description: Product removed from cart
+
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+              properties:
+                firstName:
+                  type: string
+                  example: "Alice"
+                lastName:
+                  type: string
+                  example: "Smith"
+                email:
+                  type: string
+                  format: email
+                  example: "alice@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "StrongPass123!"
+      responses:
+        "201":
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: User successfully created
+                  payload:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "64e3f4..."
+                      firstName:
+                        type: string
+                        example: Alice
+                      lastName:
+                        type: string
+                        example: Smith
+                      email:
+                        type: string
+                        example: alice@example.com
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  code:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: Email already in use
+
+  /api/auth/login:
+    post:
+      summary: Log in an existing user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "alice@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "StrongPass123!"
+      responses:
+        "200":
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: User successfully logged in
+                  payload:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: "64e3f4..."
+                          firstName:
+                            type: string
+                            example: Alice
+                          lastName:
+                            type: string
+                            example: Smith
+                          email:
+                            type: string
+                            example: alice@example.com
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  code:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: Unauthorized
+
+  /api/users/me:
+    get:
+      tags:
+        - Users
+      summary: Get user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  code:
+                    type: integer
+                    example: 200
+                  payload:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "64e3f4..."
+                      firstName:
+                        type: string
+                        example: Alice
+                      lastName:
+                        type: string
+                        example: Smith
+                      email:
+                        type: string
+                        example: alice@example.com
 
 components:
   schemas:
     Product:
       type: object
-      required:
-        - title
-        - description
-        - price
+      required: [title, description, price]
       properties:
         title:
           type: string
@@ -231,3 +423,18 @@ components:
                 type: string
               quantity:
                 type: integer
+
+    User:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8

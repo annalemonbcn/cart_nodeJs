@@ -1,5 +1,4 @@
-import ProductModel from "../db/models/product.model.js";
-import { productServices } from "../services/products.services.js";
+import { productServices } from "#services/products.services.js";
 
 const {
   fetchProductsService,
