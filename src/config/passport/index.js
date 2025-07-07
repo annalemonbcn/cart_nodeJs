@@ -64,8 +64,6 @@ const startPassport = () => {
 
           const user = await UserModel.findOne({ email: username }).lean();
 
-          console.log('user', user)
-
           if (!user) return done(null, false, { message: "Unauthorized" });
 
           if (!bcrypt.compareSync(password, user.password))
