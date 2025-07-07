@@ -1,7 +1,11 @@
 import { Router } from "express";
 import passport from "passport";
+import jwt from "jsonwebtoken";
+import "dotenv-flow/config";
 
 const router = Router();
+
+const SECRET = process.env.JWT_SECRET;
 
 router.post("/register", (req, res, next) => {
   passport.authenticate("register", { session: false }, (error, user, info) => {
@@ -40,14 +44,21 @@ router.post("/login", (req, res, next) => {
     delete user.password;
     delete user.createdAt;
     delete user.updatedAt;
+    delete user.__v;
+
+    const token = jwt.sign(user, SECRET, { expiresIn: "1h" });
 
     return res.status(200).send({
       status: "success",
       code: 200,
       message: "User successfully logged in",
-      payload: user, // -> return a JWT token, not user
+      payload: { token },
     });
   })(req, res, next);
 });
+
+// router.get('/logout', (req, res) => {
+
+// })
 
 export default router;

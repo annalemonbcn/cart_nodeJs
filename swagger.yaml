@@ -324,6 +324,21 @@ paths:
                   payload:
                     type: object
                     properties:
+                      user:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                            example: "64e3f4..."
+                          firstName:
+                            type: string
+                            example: Alice
+                          lastName:
+                            type: string
+                            example: Smith
+                          email:
+                            type: string
+                            example: alice@example.com
                       token:
                         type: string
                         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -343,6 +358,41 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
+
+  /api/users/me:
+    get:
+      tags:
+        - users
+      summary: Get user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  code:
+                    type: integer
+                    example: 200
+                  payload:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "64e3f4..."
+                      firstName:
+                        type: string
+                        example: Alice
+                      lastName:
+                        type: string
+                        example: Smith
+                      email:
+                        type: string
+                        example: alice@example.com
 
 components:
   schemas:

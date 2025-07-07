@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import "dotenv-flow/config";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
@@ -8,9 +8,6 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 import { startPassport } from "./config/passport/index.js";
 import { connectToDatabase } from "./config/db/index.js";
 import router from "./routes/index.js";
-
-const env = process.env.NODE_ENV || "development";
-dotenv.config({ path: `.env.${env}` });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
