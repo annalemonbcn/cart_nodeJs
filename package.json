@@ -10,7 +10,8 @@
     "#services/*": "./src/services/*",
     "#models/*": "./src/db/models/*",
     "#middlewares/*": "./src/middlewares/*",
-    "#constants": "./src/constants.js"
+    "#constants": "./src/constants.js",
+    "#utils/*": "./src/utils/*"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/app.js",
@@ -28,6 +29,7 @@
     "mongoose": "^8.15.1",
     "mongoose-paginate-v2": "^1.9.1",
     "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
