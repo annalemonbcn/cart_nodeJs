@@ -1,10 +1,10 @@
 import { Router } from "express";
 import UserModel from "#models/user.model.js";
-import { auth } from "#middlewares/auth/index.js";
+import { authenticateJwt } from "#middlewares/auth/index.js";
 
 const router = Router();
 
-router.get("/me", auth, async (req, res) => {
+router.get("/me", authenticateJwt, async (req, res) => {
   const { _id } = req.user;
 
   const user = await UserModel.findById(_id).select(

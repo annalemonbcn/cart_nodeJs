@@ -1,32 +1,20 @@
-import jwt from "jsonwebtoken";
 import "dotenv-flow/config";
+import passport from "passport";
 
-const SECRET = process.env.JWT_SECRET;
+const authenticateJwt = (req, res, next) => {
+  passport.authenticate("current", { session: false }, async (err, user) => {
+    if (err || !user) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized",
+      });
+    }
 
-const auth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader?.startsWith("Bearer "))
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      message: "Unauthorized",
-    });
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const user = jwt.verify(token, SECRET);
     req.user = user;
-  } catch (error) {
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      message: "Unauthorized",
-    });
-  }
 
-  next();
+    next();
+  })(req, res, next);
 };
 
-export { auth };
+export { authenticateJwt };

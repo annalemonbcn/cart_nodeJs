@@ -20,9 +20,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 startPassport();
 app.use(passport.initialize());
 
-startPassport();
-app.use(passport.initialize());
-
 app.use(router);
 
 const startServer = async () => {

@@ -1,12 +1,16 @@
 import passport from "passport";
 import passportLocal from "passport-local";
-import UserModel from "../../db/models/user.model.js";
+import passportJWT from "passport-jwt";
 import bcrypt from "bcrypt";
+import "dotenv-flow/config";
+import UserModel from "#models/user.model.js";
 import {
   validateEmail,
   validateUniqueEmail,
   validateStrongPassword,
-} from "../../utils/validations.js";
+} from "#utils/validations.js";
+
+const SECRET = process.env.JWT_SECRET;
 
 const startPassport = () => {
   passport.use(
@@ -69,6 +73,23 @@ const startPassport = () => {
           if (!bcrypt.compareSync(password, user.password))
             return done(null, false, { message: "Unauthorized" });
 
+          return done(null, user);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+
+  passport.use(
+    "current",
+    new passportJWT.Strategy(
+      {
+        secretOrKey: SECRET,
+        jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+      },
+      async (user, done) => {
+        try {
           return done(null, user);
         } catch (error) {
           return done(error);
