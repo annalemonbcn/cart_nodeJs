@@ -82,7 +82,7 @@ const startPassport = () => {
   );
 
   passport.use(
-    "current",
+    "jwt-verify",
     new passportJWT.Strategy(
       {
         secretOrKey: SECRET,

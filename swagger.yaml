@@ -361,9 +361,12 @@ paths:
 
   /api/users/me:
     get:
+      summary: Get user profile
+      description: Returns the authenticated user's profile, excluding password and internal fields.
       tags:
         - Users
-      summary: Get user profile
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: User profile
@@ -379,22 +382,47 @@ paths:
                     type: integer
                     example: 200
                   payload:
-                    type: object
-                    properties:
-                      _id:
-                        type: string
-                        example: "64e3f4..."
-                      firstName:
-                        type: string
-                        example: Alice
-                      lastName:
-                        type: string
-                        example: Smith
-                      email:
-                        type: string
-                        example: alice@example.com
+                    $ref: '#/components/schemas/User'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  code:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: Unauthorized
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  code:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: User not found
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Product:
       type: object
@@ -426,15 +454,35 @@ components:
 
     User:
       type: object
-      required: [firstName, lastName, email, password]
+      required:
+        - _id
+        - firstName
+        - lastName
+        - email
+        - password
+        - role
       properties:
+        _id:
+          type: string
+          example: "60d0fe4f5311236168a109ca"
         firstName:
           type: string
+          example: "Jane"
         lastName:
           type: string
+          example: "Doe"
         email:
           type: string
-          format: email
-        password:
+          example: "jane.doe@example.com"
+        age:
+          type: integer
+          example: 30
+        cart:
           type: string
-          minLength: 8
+          nullable: true
+          example: "60d0fe4f5311236168a109cb"
+        role:
+          type: string
+          enum: [admin, user]
+          default: user
+          example: user
