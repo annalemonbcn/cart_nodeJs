@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { CARTS_COLLECTION } from "./cart.model.js";
 
 const USERS_COLLECTION = "users";
 
@@ -20,18 +19,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
-    },
-    age: Number,
-    cart: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: CARTS_COLLECTION,
-      default: null,
-    },
-    role: {
-      type: String,
-      enum: ["admin", "user"],
-      default: "user",
       required: true,
     },
   },
