@@ -459,8 +459,8 @@ components:
         - firstName
         - lastName
         - email
-        - password
         - role
+        - googleId
       properties:
         _id:
           type: string
@@ -486,3 +486,7 @@ components:
           enum: [admin, user]
           default: user
           example: user
+        googleId:
+          type: string
+          example: "1234567890"
+          nullable: true
