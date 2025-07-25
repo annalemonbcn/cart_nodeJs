@@ -57,4 +57,26 @@ router.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+const FRONT_URL = "http://localhost:5173";
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/login",
+  }),
+  (req, res) => {
+    const token = jwt.sign({ _id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.redirect(`${FRONT_URL}/auth/success?token=${token}`);
+  }
+);
+
 export default router;

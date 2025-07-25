@@ -2,7 +2,7 @@ import "dotenv-flow/config";
 import passport from "passport";
 
 const authenticateJwt = (req, res, next) => {
-  passport.authenticate("jwt-verify", { session: false }, async (err, user) => {
+  passport.authenticate("jwt-verify", { session: false }, (err, user) => {
     if (err || !user) {
       return res.status(401).json({
         status: "error",

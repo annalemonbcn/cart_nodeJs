@@ -9,6 +9,7 @@ import {
   validateUniqueEmail,
   validateStrongPassword,
 } from "#utils/validations.js";
+import passportGoogle from "passport-google-oauth20";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -93,6 +94,42 @@ const startPassport = () => {
           return done(null, user);
         } catch (error) {
           return done(error);
+        }
+      }
+    )
+  );
+
+  passport.use(
+    "google",
+    new passportGoogle.Strategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/api/auth/google/callback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const googleId = profile.id;
+          const email = profile.emails[0].value;
+          const [firstName, ...lastNameParts] = profile.displayName.split(" ");
+          const lastName = lastNameParts.join(" ");
+
+          let user = await UserModel.findOne({ googleId });
+
+          // ? También podrías buscar por email para "vincular" cuentas si es el mismo usuario
+          if (!user) {
+            user = await UserModel.create({
+              googleId,
+              email,
+              firstName,
+              lastName,
+              authProvider: "google",
+            });
+          }
+
+          return done(null, user);
+        } catch (err) {
+          return done(err, null);
         }
       }
     )
