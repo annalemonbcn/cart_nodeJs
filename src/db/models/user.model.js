@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { collectionNames } from "../constants/index.js";
 
+const arrayLimit = (val) => val.length <= 5;
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -42,6 +44,11 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    cart: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: collectionNames.cartsCollection,
+      required: true,
+    },
     addresses: {
       type: [
         {
@@ -50,6 +57,7 @@ const userSchema = new mongoose.Schema(
         },
       ],
       default: [],
+      validate: [arrayLimit, "{PATH} exceeds the limit of 5"],
     },
   },
   { timestamps: true }

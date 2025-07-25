@@ -40,7 +40,7 @@ const addressSchema = new mongoose.Schema({
       },
     },
   },
-  phoneNumnber: {
+  phoneNumber: {
     type: String,
     required: true,
   },
