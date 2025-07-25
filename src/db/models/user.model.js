@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-
-const USERS_COLLECTION = "users";
+import { collectionNames } from "../constants/index.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,27 +26,35 @@ const userSchema = new mongoose.Schema(
         return this.authProvider === "local";
       },
     },
+    phoneNumber: String,
     role: {
       type: String,
       enum: ["admin", "user"],
       default: "user",
-    },
-    googleId: {
-      type: String,
-      unique: true,
-      sparse: true,
     },
     authProvider: {
       type: String,
       enum: ["local", "google", "github"],
       default: "local",
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    addresses: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: collectionNames.addressesCollection,
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true }
 );
 
-const UserModel = mongoose.model(USERS_COLLECTION, userSchema);
+const UserModel = mongoose.model(collectionNames.usersCollection, userSchema);
 
 export default UserModel;
-
-export { USERS_COLLECTION };

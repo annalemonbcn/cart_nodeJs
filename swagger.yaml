@@ -452,6 +452,7 @@ components:
               quantity:
                 type: integer
 
+# TODO: update User schema depending on provider
     User:
       type: object
       required:
@@ -474,6 +475,8 @@ components:
         email:
           type: string
           example: "jane.doe@example.com"
+        phoneNumber:
+          
         age:
           type: integer
           example: 30
