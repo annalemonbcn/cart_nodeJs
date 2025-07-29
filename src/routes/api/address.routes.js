@@ -5,7 +5,7 @@ import {
   createAddress,
   updateAddress,
   deleteAddress
-} from "#controllers/address.controller.js";
+} from "#controllers/address/address.controller.js";
 
 const router = Router();
 

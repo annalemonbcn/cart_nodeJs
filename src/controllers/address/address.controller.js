@@ -88,6 +88,10 @@ const createAddress = async (req, res) => {
 
     const newAddress = await createAddressService(address);
 
+    await UserModel.findByIdAndUpdate(address.user, {
+      $push: { addresses: newAddress._id },
+    });
+
     return res.status(201).json({
       status: "success",
       code: 201,
@@ -134,6 +138,14 @@ const updateAddress = async (req, res) => {
         message: `Address with id ${addressId} doesn't exist`,
       });
 
+    await UserModel.findByIdAndUpdate(updatedAddress.user, {
+      $pull: { addresses: addressId },
+    });
+
+    await UserModel.findByIdAndUpdate(updatedAddress.user, {
+      $push: { addresses: updatedAddress._id },
+    });
+
     return res.status(200).json({
       status: "success",
       code: 200,
@@ -167,6 +179,10 @@ const deleteAddress = async (req, res) => {
         code: 404,
         message: `Address with id ${addressId} doesn't exist`,
       });
+
+    await UserModel.findByIdAndUpdate(deletedAddress.user, {
+      $pull: { addresses: addressId },
+    });
 
     return res.status(200).json({
       status: "success",

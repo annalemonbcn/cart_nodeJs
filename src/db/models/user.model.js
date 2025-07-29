@@ -47,7 +47,6 @@ const userSchema = new mongoose.Schema(
     cart: {
       type: mongoose.Schema.Types.ObjectId,
       ref: collectionNames.cartsCollection,
-      required: true,
     },
     addresses: {
       type: [

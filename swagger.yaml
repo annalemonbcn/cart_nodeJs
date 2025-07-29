@@ -137,7 +137,7 @@ paths:
     delete:
       tags:
         - Products
-      summary: Delete product by ID 
+      summary: Delete product by ID
       description: Deletes a product by ID
       parameters:
         - name: pid
@@ -166,11 +166,11 @@ paths:
         required: false
       responses:
         "201":
-          $ref: '#/components/responses/CartCreated'
+          $ref: "#/components/responses/CartCreated"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
   /api/carts/{cid}:
     get:
@@ -187,13 +187,13 @@ paths:
             type: string
       responses:
         "200":
-          $ref: '#/components/responses/CartFound'
+          $ref: "#/components/responses/CartFound"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       tags:
@@ -215,13 +215,13 @@ paths:
               $ref: "#/components/schemas/Cart"
       responses:
         "200":
-          $ref: '#/components/responses/CartUpdated'
+          $ref: "#/components/responses/CartUpdated"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -237,13 +237,13 @@ paths:
             type: string
       responses:
         "200":
-          $ref: '#/components/responses/CartDeleted'
+          $ref: "#/components/responses/CartDeleted"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
   /api/carts/{cid}/product/{pid}:
     post:
@@ -266,13 +266,13 @@ paths:
             type: string
       responses:
         "201":
-          $ref: '#/components/responses/CartProductAdded'
+          $ref: "#/components/responses/CartProductAdded"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       tags:
@@ -307,13 +307,13 @@ paths:
                   example: 3
       responses:
         "200":
-          $ref: '#/components/responses/CartProductUpdated'
+          $ref: "#/components/responses/CartProductUpdated"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       tags:
@@ -335,172 +335,57 @@ paths:
             type: string
       responses:
         "200":
-          $ref: '#/components/responses/CartProductDeleted'
+          $ref: "#/components/responses/CartProductDeleted"
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "404":
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
 
   /api/auth/register:
     post:
       summary: Register a new user
       tags:
         - Auth
+      description: Creates a new user with local authentication
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - firstName
-                - lastName
-                - email
-                - password
-              properties:
-                firstName:
-                  type: string
-                  example: "Alice"
-                lastName:
-                  type: string
-                  example: "Smith"
-                email:
-                  type: string
-                  format: email
-                  example: "alice@example.com"
-                password:
-                  type: string
-                  format: password
-                  example: "StrongPass123!"
+              $ref: "#/components/schemas/User"
       responses:
         "201":
-          description: User successfully created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  code:
-                    type: integer
-                    example: 201
-                  message:
-                    type: string
-                    example: User successfully created
-                  payload:
-                    type: object
-                    properties:
-                      _id:
-                        type: string
-                        example: "64e3f4..."
-                      firstName:
-                        type: string
-                        example: Alice
-                      lastName:
-                        type: string
-                        example: Smith
-                      email:
-                        type: string
-                        example: alice@example.com
+          $ref: "#/components/responses/AuthRegister"
         "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  code:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: Email already in use
+          $ref: "#/components/responses/RegisterBadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/auth/login:
     post:
       summary: Log in an existing user
       tags:
         - Auth
+      description: Logs in an existing user with local authentication
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                  example: "alice@example.com"
-                password:
-                  type: string
-                  format: password
-                  example: "StrongPass123!"
+              $ref: "#/components/schemas/LoginUser"
       responses:
         "200":
-          description: User successfully logged in
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  code:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: User successfully logged in
-                  payload:
-                    type: object
-                    properties:
-                      user:
-                        type: object
-                        properties:
-                          _id:
-                            type: string
-                            example: "64e3f4..."
-                          firstName:
-                            type: string
-                            example: Alice
-                          lastName:
-                            type: string
-                            example: Smith
-                          email:
-                            type: string
-                            example: alice@example.com
-                      token:
-                        type: string
-                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          $ref: "#/components/responses/AuthLogin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  code:
-                    type: integer
-                    example: 401
-                  message:
-                    type: string
-                    example: Unauthorized
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
+# TODO: here
   /api/users/me:
     get:
       summary: Get user profile
@@ -610,7 +495,7 @@ components:
           type: integer
           minimum: 1
           example: 2
-          
+
     Cart:
       type: object
       required: [products]
@@ -619,6 +504,63 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CartProduct"
+
+    LoginUser:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: "alice@example.com"
+        password:
+          type: string
+          format: password
+          example: "StrongPass123!"
+
+    User:
+      type: object
+      required: [email]
+      properties:
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          example: "jane.doe@example.com"
+        password:
+          type: string
+          example: "StrongPass123!"
+        phoneNumber:
+          type: string
+          example: "666666666"
+        role:
+          type: string
+          enum: [admin, user]
+          default: user
+          example: user
+        authProvider:
+          type: string
+          enum: [local, google, github]
+          default: local
+          example: local
+        googleId:
+          type: string
+          example: "1098247023048234028304"
+        cart:
+          type: string
+          example: 64f1a2cfe2a83c0012345679
+          description: ObjectId referencing the cart
+        addresses:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            example: 64f1a2cfe2a83c0012345680
+          description: ObjectId referencing an address
 
     # 📤 "Outputs" = useful responses for the client
     ProductOutput:
@@ -639,6 +581,45 @@ components:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
 
+    UserOutput:
+      properties:
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          example: "jane.doe@example.com"
+        phoneNumber:
+          type: string
+          example: "666666666"
+        role:
+          type: string
+          enum: [admin, user]
+          default: user
+          example: user
+        authProvider:
+          type: string
+          enum: [local, google, github]
+          default: local
+          example: local
+        googleId:
+          type: string
+          example: "1098247023048234028304"
+        cart:
+          type: string
+          example: 64f1a2cfe2a83c0012345679
+          description: ObjectId referencing the cart
+        addresses:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            example: 64f1a2cfe2a83c0012345680
+          description: ObjectId referencing an address
+
     # 📡 Structured responses (standardized)
     BaseResponse:
       type: object
@@ -654,7 +635,7 @@ components:
           example: Operation successful
 
     DeleteResponse:
-      $ref: '#/components/schemas/BaseResponse'
+      $ref: "#/components/schemas/BaseResponse"
 
     ErrorResponse:
       type: object
@@ -671,61 +652,27 @@ components:
 
     ProductResponse:
       allOf:
-        - $ref: '#/components/schemas/BaseResponse'
+        - $ref: "#/components/schemas/BaseResponse"
         - type: object
           properties:
             payload:
-              $ref: '#/components/schemas/ProductOutput'
+              $ref: "#/components/schemas/ProductOutput"
 
     CartResponse:
       allOf:
-        - $ref: '#/components/schemas/BaseResponse'
+        - $ref: "#/components/schemas/BaseResponse"
         - type: object
           properties:
             payload:
-              $ref: '#/components/schemas/CartOutput'
+              $ref: "#/components/schemas/CartOutput"
 
-    # TODO: update User schema depending on provider
-    User:
-      type: object
-      required:
-        - _id
-        - firstName
-        - lastName
-        - email
-        - role
-        - googleId
-      properties:
-        _id:
-          type: string
-          example: "60d0fe4f5311236168a109ca"
-        firstName:
-          type: string
-          example: "Jane"
-        lastName:
-          type: string
-          example: "Doe"
-        email:
-          type: string
-          example: "jane.doe@example.com"
-        phoneNumber:
-
-        age:
-          type: integer
-          example: 30
-        cart:
-          type: string
-          nullable: true
-          example: "60d0fe4f5311236168a109cb"
-        role:
-          type: string
-          enum: [admin, user]
-          default: user
-          example: user
-        googleId:
-          type: string
-          example: "1234567890"
-          nullable: true
+    UserResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            payload:
+              $ref: "#/components/schemas/UserOutput"
 
   responses:
     # - Error responses
@@ -734,7 +681,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           examples:
             badRequest:
               summary: Bad Request example
@@ -748,7 +695,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           examples:
             notFound:
               summary: Not Found example
@@ -757,13 +704,52 @@ components:
                 code: 404
                 message: Resource not found
 
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            unauthorized:
+              summary: Unauthorized example
+              value:
+                status: error
+                code: 401
+                message: Unauthorized
+
+    RegisterBadRequest:
+      description: Bad request – invalid or missing data
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            emptyBody:
+              summary: Empty request body
+              value:
+                status: error
+                code: 400
+                message: Missing user data in request
+            invalidEmailFormat:
+              summary: Invalid email format
+              value:
+                status: error
+                code: 400
+                message: Email must be a valid email address
+            emailInUse:
+              summary: Email already in use
+              value:
+                status: error
+                code: 400
+                message: Email already in use
 
     InternalServerError:
       description: Internal server error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           examples:
             internalError:
               summary: Internal Server Error example
@@ -850,3 +836,22 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeleteResponse"
+
+    # - Auth responses
+    AuthRegister:
+      description: User successfully created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserResponse"
+
+    AuthLogin:
+      description: User successfully logged in
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
