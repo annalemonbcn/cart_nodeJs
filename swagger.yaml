@@ -385,63 +385,23 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-# TODO: here
-  /api/users/me:
+  /api/user/me:
     get:
-      summary: Get user profile
+      summary: Get currently authenticated user profile
       description: Returns the authenticated user's profile, excluding password and internal fields.
       tags:
-        - Users
+        - User
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: User profile
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  code:
-                    type: integer
-                    example: 200
-                  payload:
-                    $ref: "#/components/schemas/User"
+          $ref: "#/components/responses/UserProfileFound"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  code:
-                    type: integer
-                    example: 401
-                  message:
-                    type: string
-                    example: Unauthorized
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  code:
-                    type: integer
-                    example: 404
-                  message:
-                    type: string
-                    example: User not found
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   securitySchemes:
@@ -581,7 +541,8 @@ components:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
 
-    UserOutput:
+    UserProfileOutput:
+      type: object
       properties:
         firstName:
           type: string
@@ -595,6 +556,22 @@ components:
         phoneNumber:
           type: string
           example: "666666666"
+        addresses:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            example: 64f1a2cfe2a83c0012345680
+          description: ObjectId referencing an address
+        _id:
+          type: string
+          example: "64f1a2cfe2a83c0012345679"
+
+    UserInternalOutput:
+      properties:
+        email:
+          type: string
+          example: "jane.doe@example.com"
         role:
           type: string
           enum: [admin, user]
@@ -608,17 +585,14 @@ components:
         googleId:
           type: string
           example: "1098247023048234028304"
-        cart:
+        createdAt:
           type: string
-          example: 64f1a2cfe2a83c0012345679
-          description: ObjectId referencing the cart
-        addresses:
-          type: array
-          maxItems: 5
-          items:
-            type: string
-            example: 64f1a2cfe2a83c0012345680
-          description: ObjectId referencing an address
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
 
     # 📡 Structured responses (standardized)
     BaseResponse:
@@ -672,7 +646,7 @@ components:
         - type: object
           properties:
             payload:
-              $ref: "#/components/schemas/UserOutput"
+              $ref: "#/components/schemas/UserProfileOutput"
 
   responses:
     # - Error responses
@@ -855,3 +829,11 @@ components:
               token:
                 type: string
                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+    # - User responses
+    UserProfileFound:
+      description: User profile found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserProfileOutput"

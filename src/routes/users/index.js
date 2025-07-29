@@ -8,7 +8,7 @@ router.get("/me", authenticateJwt, async (req, res) => {
   const { _id } = req.user;
 
   const user = await UserModel.findById(_id).select(
-    "-password -createdAt -updatedAt -__v"
+    "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
   );
 
   if (!user)

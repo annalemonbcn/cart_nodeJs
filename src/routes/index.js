@@ -11,7 +11,7 @@ const router = Router();
 router.use("/api/products", productsRoutes);
 router.use("/api/carts", cartsRoutes);
 router.use("/api/auth", authRoutes);
-router.use("/api/users", usersRoutes);
+router.use("/api/user", usersRoutes);
 router.use("/api/address", addressRoutes);
 router.use("/", viewsRoutes); // -> TODO: delete in a future
 
