@@ -354,7 +354,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/RegisterUserInput"
       responses:
         "201":
           $ref: "#/components/responses/AuthRegister"
@@ -374,7 +374,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginUser"
+              $ref: "#/components/schemas/LoginUserInput"
       responses:
         "200":
           $ref: "#/components/responses/AuthLogin"
@@ -465,22 +465,8 @@ components:
           items:
             $ref: "#/components/schemas/CartProduct"
 
-    LoginUser:
-      type: object
-      required: [email, password]
-      properties:
-        email:
-          type: string
-          format: email
-          example: "alice@example.com"
-        password:
-          type: string
-          format: password
-          example: "StrongPass123!"
-
     User:
       type: object
-      required: [email]
       properties:
         firstName:
           type: string
@@ -490,9 +476,11 @@ components:
           example: "Doe"
         email:
           type: string
+          format: email
           example: "jane.doe@example.com"
         password:
           type: string
+          format: password
           example: "StrongPass123!"
         phoneNumber:
           type: string
@@ -522,28 +510,123 @@ components:
             example: 64f1a2cfe2a83c0012345680
           description: ObjectId referencing an address
 
+    DeliveryAddress:
+      type: object
+      required: [street, zipCode, city, province, country]
+      properties:
+        street:
+          type: string
+          example: "123 Main St"
+        additionalInfo:
+          type: string
+          example: "Apt 4B"
+        zipCode:
+          type: string
+          example: "12345"
+        city:
+          type: string
+          example: "Springfield"
+        province:
+          type: string
+          example: "Springfield"
+        country:
+          type: string
+          example: "Springfield"
+
+    Address:
+      type: object
+      required: [user, firstName, lastName, deliveryAddress, phoneNumber]
+      properties:
+        user:
+          type: string
+          example: 64f1a2cfe2a83c0012345679
+          description: ObjectId referencing the user
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
+        deliveryAddress:
+          $ref: "#/components/schemas/DeliveryAddress"
+        phoneNumber:
+          type: string
+          example: "666666666"
+        isDefault:
+          type: boolean
+          default: false
+          example: false
+        tags:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            example: "home"
+
+    # 📥 "Inputs" = form inputs data shape
+    RegisterUserInput:
+      type: object
+      required: [firstName, lastName, email, password]
+      properties:
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "jane.doe@example.com"
+        password:
+          type: string
+          format: password
+          example: "StrongPass123!"
+
+    LoginUserInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: "alice@example.com"
+        password:
+          type: string
+          format: password
+          example: "StrongPass123!"
+
     # 📤 "Outputs" = useful responses for the client
     ProductOutput:
       allOf:
         - $ref: "#/components/schemas/Product"
         - type: object
+          required: [_id]
           properties:
             _id:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
+              description: ObjectId of the product
 
     CartOutput:
       allOf:
         - $ref: "#/components/schemas/Cart"
         - type: object
           properties:
+            required: [_id]
             _id:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
+              description: ObjectId of the cart
 
     UserProfileOutput:
       type: object
+      required: [firstName, lastName, email, addresses, _id]
       properties:
+        _id:
+          type: string
+          example: "64f1a2cfe2a83c0012345679"
+          description: ObjectId of the user
         firstName:
           type: string
           example: "Jane"
@@ -563,12 +646,15 @@ components:
             type: string
             example: 64f1a2cfe2a83c0012345680
           description: ObjectId referencing an address
+
+    UserInternalOutput:
+      type: object
+      required: [_id, email, role, authProvider, createdAt, updatedAt]
+      properties:
         _id:
           type: string
           example: "64f1a2cfe2a83c0012345679"
-
-    UserInternalOutput:
-      properties:
+          description: ObjectId of the user
         email:
           type: string
           example: "jane.doe@example.com"
@@ -597,6 +683,7 @@ components:
     # 📡 Structured responses (standardized)
     BaseResponse:
       type: object
+      required: [status, code, message]
       properties:
         status:
           type: string
@@ -613,6 +700,7 @@ components:
 
     ErrorResponse:
       type: object
+      required: [status, code, message]
       properties:
         status:
           type: string
@@ -628,6 +716,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
         - type: object
+          required: [payload]
           properties:
             payload:
               $ref: "#/components/schemas/ProductOutput"
@@ -636,6 +725,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
         - type: object
+          required: [payload]
           properties:
             payload:
               $ref: "#/components/schemas/CartOutput"
@@ -644,9 +734,15 @@ components:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
         - type: object
+          required: [payload]
           properties:
             payload:
               $ref: "#/components/schemas/UserProfileOutput"
+
+    Token:
+      type: string
+      format: jwt
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
   responses:
     # - Error responses
@@ -825,10 +921,10 @@ components:
         application/json:
           schema:
             type: object
+            required: [token]
             properties:
               token:
-                type: string
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                $ref: "#/components/schemas/Token"
 
     # - User responses
     UserProfileFound:

@@ -1,6 +1,30 @@
 import mongoose from "mongoose";
 import { collectionNames } from "../constants/index.js";
 
+const deliveryAddressSchema = new mongoose.Schema({
+  street: {
+    type: String,
+    required: true,
+  },
+  additionalInfo: String,
+  zipCode: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+  province: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
+  },
+});
+
 const addressSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -16,29 +40,8 @@ const addressSchema = new mongoose.Schema({
     required: true,
   },
   deliveryAddress: {
-    type: {
-      street: {
-        type: String,
-        required: true,
-      },
-      additionalInfo: String,
-      zipCode: {
-        type: String,
-        required: true,
-      },
-      city: {
-        type: String,
-        required: true,
-      },
-      province: {
-        type: String,
-        required: true,
-      },
-      country: {
-        type: String,
-        required: true,
-      },
-    },
+    type: deliveryAddressSchema,
+    required: true,
   },
   phoneNumber: {
     type: String,

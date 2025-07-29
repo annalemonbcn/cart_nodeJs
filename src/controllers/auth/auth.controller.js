@@ -13,7 +13,6 @@ const registerUser = async (req, res, next) => {
 
   try {
     const { error, user, info } = await registerUserService(req);
-    console.log("user", user);
 
     if (error) return next(error);
 

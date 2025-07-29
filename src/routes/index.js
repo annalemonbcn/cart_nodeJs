@@ -3,7 +3,7 @@ import productsRoutes from "#routes/api/products.routes.js";
 import cartsRoutes from "#routes/api/carts.routes.js";
 import viewsRoutes from "#routes/views/views.routes.js";
 import authRoutes from "#routes/auth/index.js";
-import usersRoutes from "#routes/users/index.js";
+import usersRoutes from "#routes/user/index.js";
 import addressRoutes from "#routes/api/address.routes.js";
 
 const router = Router();

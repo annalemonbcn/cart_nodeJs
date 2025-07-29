@@ -28,7 +28,10 @@ const userSchema = new mongoose.Schema(
         return this.authProvider === "local";
       },
     },
-    phoneNumber: String,
+    phoneNumber: {
+      type: String,
+      default: undefined,
+    },
     role: {
       type: String,
       enum: ["admin", "user"],
