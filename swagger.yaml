@@ -396,12 +396,76 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/UserProfileFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
+
+  /api/user/{uid}:
+    put: 
+      summary: Update user profile
+      description: Updates the authenticated user's profile, excluding password and internal fields.
+      tags:
+        - User
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserProfileUpdated"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      summary: Delete user profile
+      description: Deletes the authenticated user's profile.
+      tags:
+        - User
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          $ref: "#/components/responses/UserProfileDeleted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    
 
   /api/address:
     get:
@@ -649,6 +713,34 @@ components:
           type: string
           format: password
           example: "StrongPass123!"
+
+    UserProfileInput:
+      type: object
+      required: [firstName, lastName, email, addresses, _id]
+      properties:
+        _id:
+          type: string
+          example: "64f1a2cfe2a83c0012345679"
+          description: ObjectId of the user
+        firstName:
+          type: string
+          example: "Jane"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          example: "jane.doe@example.com"
+        phoneNumber:
+          type: string
+          example: "666666666"
+        addresses:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            example: 64f1a2cfe2a83c0012345680
+          description: ObjectId referencing an address
 
     # 📤 "Outputs" = useful responses for the client
     ProductOutput:
@@ -930,6 +1022,20 @@ components:
                 code: 500
                 message: Internal server error
 
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            conflict:
+              summary: Conflict example
+              value:
+                status: error
+                code: 409
+                message: Email already in use
+
     # - Product responses
     ProductCreated:
       description: Product successfully created
@@ -1031,6 +1137,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UserResponse"
+
+    UserProfileUpdated:
+      description: User profile successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserResponse"
+
+    UserProfileDeleted:
+      description: User profile successfully deleted
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeleteResponse"
 
     # - Address responses
     AllAddressFound:

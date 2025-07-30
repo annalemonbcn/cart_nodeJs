@@ -1,18 +1,20 @@
-class NotFoundError extends Error {
-  constructor(message) {
+class AppError extends Error {
+  constructor(message, statusCode) {
     super(message);
-    this.name = "NotFoundError";
-    this.statusCode = 404;
+    this.statusCode = statusCode;
   }
 }
 
-//  TODO: ??
-class BadRequestError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "BadRequestError";
-    this.statusCode = 400;
+class NotFoundError extends AppError {
+  constructor(message = "Resource not found") {
+    super(message, 404);
   }
 }
 
-export { NotFoundError, BadRequestError };
+class BadRequestError extends AppError {
+  constructor(message = "Bad request") {
+    super(message, 400);
+  }
+}
+
+export { NotFoundError, BadRequestError, AppError };
