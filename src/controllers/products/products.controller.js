@@ -62,7 +62,7 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   const product = req.body;
 
-  if (Object.keys(product).length === 0)
+  if (!product || Object.keys(product).length === 0)
     return res.status(400).json({
       status: "error",
       code: 400,

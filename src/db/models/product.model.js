@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-
-const PRODUCTS_COLLECTION = "products";
+import { collectionNames } from "../constants/index.js";
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -58,8 +57,9 @@ const productSchema = new mongoose.Schema({
 });
 
 productSchema.plugin(mongoosePaginate);
-const ProductModel = mongoose.model(PRODUCTS_COLLECTION, productSchema);
+const ProductModel = mongoose.model(
+  collectionNames.productsCollection,
+  productSchema
+);
 
 export default ProductModel;
-
-export { PRODUCTS_COLLECTION };

@@ -23,7 +23,7 @@ const startPassport = () => {
       },
       async (req, username, password, done) => {
         try {
-          let { firstName, lastName } = req.body;
+          let { firstName, lastName, phoneNumber, addresses } = req.body;
 
           if (!firstName || !lastName)
             return done(null, false, { message: "All fields are required" });
@@ -46,6 +46,8 @@ const startPassport = () => {
             lastName,
             email: username,
             password: bcrypt.hashSync(password, 10),
+            phoneNumber,
+            addresses,
           });
 
           return done(null, user);

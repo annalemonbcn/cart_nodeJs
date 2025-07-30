@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-import { PRODUCTS_COLLECTION } from "./product.model.js";
-
-const CARTS_COLLECTION = "carts";
+import { collectionNames } from "../constants/index.js";
 
 const cartSchema = new mongoose.Schema({
   products: {
@@ -9,7 +7,7 @@ const cartSchema = new mongoose.Schema({
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: PRODUCTS_COLLECTION,
+          ref: collectionNames.productsCollection,
           required: true,
         },
         quantity: {
@@ -24,8 +22,6 @@ const cartSchema = new mongoose.Schema({
   },
 });
 
-const CartModel = mongoose.model(CARTS_COLLECTION, cartSchema);
+const CartModel = mongoose.model(collectionNames.cartsCollection, cartSchema);
 
 export default CartModel;
-
-export { CARTS_COLLECTION };
