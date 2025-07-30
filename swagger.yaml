@@ -403,6 +403,60 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/address:
+    get:
+      tags:
+        - Address
+      summary: Get all addresses
+      description: Returns all addresses from all users in DB
+      responses:
+        "200":
+          $ref: "#/components/responses/AllAddressFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      tags:
+        - Address
+      summary: Create a new address
+      description: Creates a new address for the authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "201":
+          $ref: "#/components/responses/AddressCreated"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/adress/{addressId}:
+    get:
+      tags:
+        - Address
+      summary: Get address by ID
+      description: Returns an address by ID
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: The ID of the address
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/AddressFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -612,8 +666,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/Cart"
         - type: object
+          required: [_id]
           properties:
-            required: [_id]
             _id:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
@@ -680,10 +734,26 @@ components:
           format: date-time
           example: "2024-01-01T00:00:00.000Z"
 
+    AddressOutput:
+      allOf:
+        - $ref: "#/components/schemas/Address"
+        - type: object
+          required: [_id]
+          properties:
+            _id:
+              type: string
+              example: "64f1a2cfe2a83c0012345680"
+              description: ObjectId of the address
+
+    AllAddressOutput:
+      type: array
+      items:
+        $ref: "#/components/schemas/AddressOutput"
+
     # 📡 Structured responses (standardized)
     BaseResponse:
       type: object
-      required: [status, code, message]
+      required: [status, code]
       properties:
         status:
           type: string
@@ -739,10 +809,42 @@ components:
             payload:
               $ref: "#/components/schemas/UserProfileOutput"
 
-    Token:
-      type: string
-      format: jwt
-      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    LoginPayload:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+          format: jwt
+          description: JWT token
+
+    LoginResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              $ref: "#/components/schemas/LoginPayload"
+
+    AllAddressResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              $ref: "#/components/schemas/AllAddressOutput"
+
+    AddressResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              $ref: "#/components/schemas/AddressOutput"
 
   responses:
     # - Error responses
@@ -920,11 +1022,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required: [token]
-            properties:
-              token:
-                $ref: "#/components/schemas/Token"
+            $ref: "#/components/schemas/LoginResponse"
 
     # - User responses
     UserProfileFound:
@@ -932,4 +1030,26 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/UserProfileOutput"
+            $ref: "#/components/schemas/UserResponse"
+
+    # - Address responses
+    AllAddressFound:
+      description: Address found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AllAddressResponse"
+
+    AddressFound:
+      description: Address found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AddressResponse"
+
+    AddressCreated:
+      description: Address successfully created
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AddressResponse"
