@@ -1,26 +1,17 @@
 import { authServices } from "#services/auth.services.js";
 import { cleanUser, generateToken } from "./utils.js";
+import { AppError, BadRequestError, UnauthorizedError } from "#utils/errors.js";
 
 const { registerUserService, loginUserService } = authServices;
 
 const registerUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing user data in request",
-    });
+    throw new BadRequestError("registerUser: Missing user data in request");
 
   try {
-    const { error, user, info } = await registerUserService(req);
+    const { error, user } = await registerUserService(req);
 
-    if (error) return next(error);
-
-    if (!user) {
-      return res
-        .status(400)
-        .json({ status: "error", code: 400, message: info.message });
-    }
+    if (error) throw error;
 
     const userObj = cleanUser(user);
     return res.status(201).json({
@@ -36,22 +27,12 @@ const registerUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing user data in request",
-    });
+    throw new BadRequestError("loginUser: Missing user data in request");
 
   try {
-    const { error, user, info } = await loginUserService(req);
+    const { error, user } = await loginUserService(req);
 
-    if (error) return next(error);
-
-    if (!user) {
-      return res
-        .status(401)
-        .json({ status: "error", code: 401, message: info.message });
-    }
+    if (error) throw error;
 
     const userObj = cleanUser(user);
     const token = generateToken(userObj);

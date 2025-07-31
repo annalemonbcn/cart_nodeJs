@@ -6,10 +6,9 @@ const getUserProfileByIdService = async (userId) => {
   const userProfile = await UserModel.findById(userId).select(
     "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
   );
-  console.log('userProfile', userProfile)
 
   if (!userProfile)
-    throw new NotFoundError(`User with id ${userId} doesn't exist`);
+    throw new NotFoundError(`getUserProfileByIdService: User with id ${userId} doesn't exist`);
 
   return userProfile;
 };

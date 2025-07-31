@@ -1,58 +1,41 @@
 import AddressModel from "#models/address.model.js";
+import { NotFoundError } from "#utils/errors.js";
 
 const getAllAddressService = async () => {
-  try {
-    return await AddressModel.find();
-  } catch (error) {
-    throw new Error(`Error getting addresses: ` + error.message);
-  }
+  const addresses = await AddressModel.find();
+  return addresses;
 };
 
 const getAddressByIdService = async (addressId) => {
-  try {
-    const address = await AddressModel.findById(addressId);
-    if (!address) return null;
+  const address = await AddressModel.findById(addressId);
+  if (!address) throw new NotFoundError("getAddressById: Address not found");
 
-    return address;
-  } catch (error) {
-    throw new Error(`Error getting address by id: ` + error.message);
-  }
+  return address;
 };
 
 const createAddressService = async (address) => {
-  try {
-    const newAddress = await AddressModel.create(address);
-    return newAddress;
-  } catch (error) {
-    throw new Error(`Error creating address: ` + error.message);
-  }
+  const newAddress = await AddressModel.create(address);
+  return newAddress;
 };
 
 const updateAddressService = async (addressId, fieldsToUpdate) => {
-  try {
-    const options = { new: true, runValidators: true };
-    const updatedAddress = await AddressModel.findByIdAndUpdate(
-      addressId,
-      fieldsToUpdate,
-      options
-    );
-    if (!updatedAddress) return null;
+  const options = { new: true, runValidators: true };
+  const updatedAddress = await AddressModel.findByIdAndUpdate(
+    addressId,
+    fieldsToUpdate,
+    options
+  );
+  if (!updatedAddress)
+    throw new NotFoundError("updateAddress: Address not found");
 
-    return updatedAddress;
-  } catch (error) {
-    throw new Error(`Error updating address ${addressId}: ` + error.message);
-  }
+  return updatedAddress;
 };
 
 const deleteAddressService = async (addressId) => {
-  try {
-    const deletedAddress = await AddressModel.findByIdAndDelete(addressId);
-    if (!deletedAddress) return null;
+  const deletedAddress = await AddressModel.findByIdAndDelete(addressId);
+  if (!deletedAddress) throw new NotFoundError("deleteAddress: Address not found");
 
-    return deletedAddress;
-  } catch (error) {
-    throw new Error(`Error deleting address ${addressId}: ` + error.message);
-  }
+  return deletedAddress;
 };
 
 const addressServices = {

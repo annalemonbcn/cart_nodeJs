@@ -8,6 +8,7 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 import { startPassport } from "./config/passport/index.js";
 import { connectToDatabase } from "./config/db/index.js";
 import router from "#routes/index.js";
+import { errorHandler } from "#middlewares/errorHandler/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -21,6 +22,8 @@ startPassport();
 app.use(passport.initialize());
 
 app.use(router);
+
+app.use(errorHandler);
 
 const startServer = async () => {
   await connectToDatabase();
