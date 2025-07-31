@@ -1,6 +1,7 @@
 import { addressServices } from "#services/address.services.js";
 import mongoose from "mongoose";
 import UserModel from "#models/user.model.js";
+import { BadRequestError, NotFoundError } from "#utils/errors.js";
 
 const {
   getAllAddressService,
@@ -11,99 +12,55 @@ const {
 } = addressServices;
 
 const getAllAddress = async (req, res) => {
-  try {
-    const addresses = await getAllAddressService();
+  const addresses = await getAllAddressService();
 
-    return res.status(200).json({
-      status: "success",
-      code: 200,
-      payload: addresses,
-    });
-  } catch (error) {
-    console.error("Error in getAllAddress:", error.message);
-    return res
-      .status(500)
-      .json({ status: "error", code: 500, message: "Internal server error" });
-  }
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: addresses,
+  });
 };
 
 const getAddressById = async (req, res) => {
   const { addressId } = req.params;
-
   if (!addressId)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing address id in request params",
-    });
+    throw new BadRequestError("getAddressById: Missing address id");
 
-  try {
-    const address = await getAddressByIdService(addressId);
+  const address = await getAddressByIdService(addressId);
+  if (!address) throw new NotFoundError("getAddressById: Address not found");
 
-    if (!address)
-      return res.status(404).json({
-        status: "error",
-        code: 404,
-        message: `Address with id ${addressId} doesn't exist`,
-      });
-
-    return res
-      .status(200)
-      .json({ status: "success", code: 200, payload: address });
-  } catch (error) {
-    console.error("Error in getAddressById:", error.message);
-    return res
-      .status(500)
-      .json({ status: "error", code: 500, message: "Internal server error" });
-  }
+  return res
+    .status(200)
+    .json({ status: "success", code: 200, payload: address });
 };
 
 const createAddress = async (req, res) => {
   const address = req.body;
 
   if (!address || Object.keys(address).length === 0)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing address in request body",
-    });
+    throw new BadRequestError(
+      "createAddress: Missing address fields in request body"
+    );
 
-  if (!mongoose.Types.ObjectId.isValid(address.user)) {
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Invalid user ID format",
-    });
-  }
+  if (!mongoose.Types.ObjectId.isValid(address.user))
+    throw new BadRequestError("createAddress: Invalid user ID format");
 
-  try {
-    const userExists = await UserModel.exists({ _id: address.user });
-    if (!userExists) {
-      return res.status(404).json({
-        status: "error",
-        code: 404,
-        message: "User not found",
-      });
-    }
+  const userExists = await UserModel.exists({ _id: address.user });
+  if (!userExists) throw new NotFoundError("createAddress: User not found");
 
-    const newAddress = await createAddressService(address);
+  const newAddress = await createAddressService(address);
 
-    await UserModel.findByIdAndUpdate(address.user, {
-      $push: { addresses: newAddress._id },
-    });
+  // TODO: keep this here?
+  await UserModel.findByIdAndUpdate(address.user, {
+    $push: { addresses: newAddress._id },
+  });
 
-    return res.status(201).json({
-      status: "success",
-      code: 201,
-      message: "Address successfully created",
-      payload: newAddress,
-    });
-  } catch (error) {
-    console.error("Error in createAddress:", error.message);
-    return res
-      .status(500)
-      .json({ status: "error", code: 500, message: "Internal server error" });
-  }
+  return res.status(201).json({
+    status: "success",
+    code: 201,
+    message: "Address successfully created",
+    payload: newAddress,
+  });
 };
 
 const updateAddress = async (req, res) => {
@@ -111,91 +68,57 @@ const updateAddress = async (req, res) => {
   const fieldsToUpdate = req.body;
 
   if (!addressId || Object.keys(fieldsToUpdate).length === 0)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing address id or fieldsToUpdate property in request",
-    });
-
-  if ("user" in req.body) {
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "The user of an address cannot be modified",
-    });
-  }
-
-  try {
-    const updatedAddress = await updateAddressService(
-      addressId,
-      fieldsToUpdate
+    throw new BadRequestError(
+      "updateAddress: Missing address id or fieldsToUpdate property in request"
     );
 
-    if (!updatedAddress)
-      return res.status(404).json({
-        status: "error",
-        code: 404,
-        message: `Address with id ${addressId} doesn't exist`,
-      });
+  if ("user" in req.body)
+    throw new BadRequestError(
+      "updateAddress: The user of an address cannot be modified"
+    );
 
-    await UserModel.findByIdAndUpdate(updatedAddress.user, {
-      $pull: { addresses: addressId },
-    });
+  const updatedAddress = await updateAddressService(addressId, fieldsToUpdate);
 
-    await UserModel.findByIdAndUpdate(updatedAddress.user, {
-      $push: { addresses: updatedAddress._id },
-    });
+  if (!updatedAddress)
+    throw new NotFoundError("updateAddress: Address not found");
 
-    return res.status(200).json({
-      status: "success",
-      code: 200,
-      message: "Address updated successfully",
-      payload: updatedAddress,
-    });
-  } catch (error) {
-    console.error("Error in updateAddress:", error.message);
-    return res
-      .status(500)
-      .json({ status: "error", code: 500, message: "Internal server error" });
-  }
+  await UserModel.findByIdAndUpdate(updatedAddress.user, {
+    $pull: { addresses: addressId },
+  });
+
+  await UserModel.findByIdAndUpdate(updatedAddress.user, {
+    $push: { addresses: updatedAddress._id },
+  });
+
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Address updated successfully",
+    payload: updatedAddress,
+  });
 };
 
 const deleteAddress = async (req, res) => {
   const { addressId } = req.params;
 
   if (!addressId)
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      message: "Missing address id in request params",
-    });
+    throw new BadRequestError("deleteAddress: Missing address id");
 
-  try {
-    const deletedAddress = await deleteAddressService(addressId);
+  const deletedAddress = await deleteAddressService(addressId);
 
-    if (!deletedAddress)
-      return res.status(404).json({
-        status: "error",
-        code: 404,
-        message: `Address with id ${addressId} doesn't exist`,
-      });
+  if (!deletedAddress)
+    throw new NotFoundError("deleteAddress: Address not found");
 
-    await UserModel.findByIdAndUpdate(deletedAddress.user, {
-      $pull: { addresses: addressId },
-    });
+  await UserModel.findByIdAndUpdate(deletedAddress.user, {
+    $pull: { addresses: addressId },
+  });
 
-    return res.status(200).json({
-      status: "success",
-      code: 200,
-      message: "Address deleted successfully",
-      payload: deletedAddress,
-    });
-  } catch (error) {
-    console.error("Error in deleteAddress:", error.message);
-    return res
-      .status(500)
-      .json({ status: "error", code: 500, message: "Internal server error" });
-  }
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Address deleted successfully",
+    payload: deletedAddress,
+  });
 };
 
 export {

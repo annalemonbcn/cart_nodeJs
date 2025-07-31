@@ -10,6 +10,7 @@ import {
   validateStrongPassword,
 } from "#utils/validations.js";
 import passportGoogle from "passport-google-oauth20";
+import { AppError, BadRequestError, UnauthorizedError } from "#utils/errors.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -26,20 +27,25 @@ const startPassport = () => {
           let { firstName, lastName, phoneNumber, addresses } = req.body;
 
           if (!firstName || !lastName)
-            return done(null, false, { message: "All fields are required" });
+            return done(
+              new BadRequestError(
+                "register: First name and last name are required"
+              )
+            );
 
           if (!validateEmail(username))
-            return done(null, false, { message: "Invalid email format" });
+            return done(new BadRequestError("register: Invalid email format"));
 
           const isUnique = await validateUniqueEmail(username);
           if (!isUnique)
-            return done(null, false, { message: "Email already in use" });
+            return done(new AppError("register: Email already in use", 409));
 
           if (!validateStrongPassword(password))
-            return done(null, false, {
-              message:
-                "Password must be at least 8 characters, include one uppercase letter and one special character",
-            });
+            return done(
+              new BadRequestError(
+                "register: Password must be at least 8 characters, include one uppercase letter and one special character"
+              )
+            );
 
           const user = await UserModel.create({
             firstName,
@@ -67,14 +73,14 @@ const startPassport = () => {
       async (username, password, done) => {
         try {
           if (!validateEmail(username))
-            return done(null, false, { message: "Invalid email format" });
+            return done(new BadRequestError("login: Invalid email format"));
 
           const user = await UserModel.findOne({ email: username }).lean();
 
-          if (!user) return done(null, false, { message: "Unauthorized" });
-
-          if (!bcrypt.compareSync(password, user.password))
-            return done(null, false, { message: "Unauthorized" });
+          if (!user || !bcrypt.compareSync(password, user.password))
+            return done(
+              new UnauthorizedError("login: Email or password is incorrect")
+            );
 
           return done(null, user);
         } catch (error) {

@@ -1,3 +1,4 @@
+import { NotFoundError } from "#utils/errors.js";
 import ProductModel from "../db/models/product.model.js";
 import { buildPaginationLinks } from "../helpers/index.js";
 
@@ -63,51 +64,44 @@ const fetchProductsService = async (req) => {
 };
 
 const getProductByIdService = async (pid) => {
-  try {
-    const product = await ProductModel.findById(pid).lean();
-    if (!product) return null;
+  const product = await ProductModel.findById(pid).lean();
+  if (!product)
+    throw new NotFoundError(
+      `getProductByIdService: Product with id ${pid} doesn't exist`
+    );
 
-    return product;
-  } catch (error) {
-    throw new Error(`Error getting product by id: ` + error.message);
-  }
+  return product;
 };
 
 const createProductService = async (product) => {
-  try {
-    const newProduct = await ProductModel.create(product);
-    return newProduct;
-  } catch (error) {
-    throw new Error(`Error creating a product: ` + error.message);
-  }
+  const newProduct = await ProductModel.create(product);
+  return newProduct;
 };
 
 const updateProductService = async (pid, fieldsToUpdate) => {
-  try {
-    const options = { new: true, runValidators: true };
-    const updatedproduct = await ProductModel.findByIdAndUpdate(
-      pid,
-      fieldsToUpdate,
-      options
+  const options = { new: true, runValidators: true };
+  const updatedproduct = await ProductModel.findByIdAndUpdate(
+    pid,
+    fieldsToUpdate,
+    options
+  );
+
+  if (!updatedproduct)
+    throw new NotFoundError(
+      `updateProductService: Product with id ${pid} doesn't exist`
     );
 
-    if (!updatedproduct) return null;
-
-    return updatedproduct;
-  } catch (error) {
-    throw new Error(`Error updating product ${pid}: ` + error.message);
-  }
+  return updatedproduct;
 };
 
 const deleteProductService = async (pid) => {
-  try {
-    const deletedProduct = await ProductModel.findByIdAndDelete(pid);
-    if (!deletedProduct) return null;
+  const deletedProduct = await ProductModel.findByIdAndDelete(pid);
+  if (!deletedProduct)
+    throw new NotFoundError(
+      `deleteProductService:Product with id ${pid} doesn't exist`
+    );
 
-    return deletedProduct;
-  } catch (error) {
-    throw new Error(`Error deleting product ${pid}: ` + error.message);
-  }
+  return deletedProduct;
 };
 
 const productServices = {

@@ -9,90 +9,51 @@ const {
 
 const getCurrentUserProfile = async (req, res) => {
   const userId = req.user?._id;
-  if (!userId) throw new BadRequestError("Missing user id");
+  if (!userId)
+    throw new BadRequestError("getCurrentUserProfile: Missing user id");
 
-  try {
-    const userProfile = await getUserProfileByIdService(userId);
+  const userProfile = await getUserProfileByIdService(userId);
 
-    res.status(200).json({
-      status: "success",
-      code: 200,
-      payload: userProfile,
-    });
-  } catch (error) {
-    console.error("Error in getCurrentUserProfile:", error);
-
-    const status = error.statusCode || 500;
-    const message = error.message || "Internal server error";
-
-    res.status(status).json({
-      status: "error",
-      code: status,
-      message,
-    });
-  }
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: userProfile,
+  });
 };
 
 const updateProfile = async (req, res) => {
   const userId = req.user?._id;
-  if (!userId) throw new BadRequestError("Missing user id");
+  if (!userId) throw new BadRequestError("updateProfile: Missing user id");
 
   const fieldsToUpdate = req.body;
-
   if (Object.keys(fieldsToUpdate).length === 0) {
-    throw new BadRequestError("Missing fields to update");
+    throw new BadRequestError("updateProfile: Missing fields to update");
   }
 
-  try {
-    const updatedProfile = await updateUserProfileByIdService(
-      userId,
-      fieldsToUpdate
-    );
+  const updatedProfile = await updateUserProfileByIdService(
+    userId,
+    fieldsToUpdate
+  );
 
-    res.status(200).json({
-      status: "success",
-      code: 200,
-      payload: updatedProfile,
-      message: "User profile updated successfully",
-    });
-  } catch (error) {
-    console.error("Error in updateProfile:", error);
-
-    const status = error.statusCode || 500;
-    const message = error.message || "Internal server error";
-
-    res.status(status).json({
-      status: "error",
-      code: status,
-      message,
-    });
-  }
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: updatedProfile,
+    message: "User profile updated successfully",
+  });
 };
 
 const deleteProfile = async (req, res) => {
   const userId = req.user?._id;
-  if (!userId) throw new BadRequestError("Missing user id");
+  if (!userId) throw new BadRequestError("deleteProfile: Missing user id");
 
-  try {
-    await deleteProfileByIdService(userId);
+  await deleteProfileByIdService(userId);
 
-    res.status(200).json({
-      status: "success",
-      code: 200,
-      message: "User profile deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error in deleteProfile:", error);
-
-    const status = error.statusCode || 500;
-    const message = error.message || "Internal server error";
-
-    res.status(status).json({
-      status: "error",
-      code: status,
-      message,
-    });
-  }
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "User profile deleted successfully",
+  });
 };
 
 export { getCurrentUserProfile, updateProfile, deleteProfile };
