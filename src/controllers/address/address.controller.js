@@ -1,33 +1,29 @@
-import { addressServices } from "#services/address.services.js";
-import mongoose from "mongoose";
+import { addressServices } from "#services/address/address.services.js";
 import UserModel from "#models/user.model.js";
-import { BadRequestError, NotFoundError } from "#utils/errors.js";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from "#utils/errors.js";
+import { isValidAddressId } from "#services/address/utils.js";
 
 const {
-  getAllAddressService,
   getAddressByIdService,
   createAddressService,
   updateAddressService,
   deleteAddressService,
 } = addressServices;
 
-const getAllAddress = async (req, res) => {
-  const addresses = await getAllAddressService();
-
-  return res.status(200).json({
-    status: "success",
-    code: 200,
-    payload: addresses,
-  });
-};
-
 const getAddressById = async (req, res) => {
+  const userId = req.user._id;
   const { addressId } = req.params;
+
   if (!addressId)
     throw new BadRequestError("getAddressById: Missing address id");
 
-  const address = await getAddressByIdService(addressId);
-  if (!address) throw new NotFoundError("getAddressById: Address not found");
+  isValidAddressId(addressId);
+
+  const address = await getAddressByIdService(addressId, userId);
 
   return res
     .status(200)
@@ -35,25 +31,15 @@ const getAddressById = async (req, res) => {
 };
 
 const createAddress = async (req, res) => {
-  const address = req.body;
+  const userId = req.user._id;
+  const addressData = req.body;
 
-  if (!address || Object.keys(address).length === 0)
+  if (!addressData || Object.keys(addressData).length === 0)
     throw new BadRequestError(
       "createAddress: Missing address fields in request body"
     );
 
-  if (!mongoose.Types.ObjectId.isValid(address.user))
-    throw new BadRequestError("createAddress: Invalid user ID format");
-
-  const userExists = await UserModel.exists({ _id: address.user });
-  if (!userExists) throw new NotFoundError("createAddress: User not found");
-
-  const newAddress = await createAddressService(address);
-
-  // TODO: keep this here?
-  await UserModel.findByIdAndUpdate(address.user, {
-    $push: { addresses: newAddress._id },
-  });
+  const newAddress = await createAddressService(userId, addressData);
 
   return res.status(201).json({
     status: "success",
@@ -66,29 +52,25 @@ const createAddress = async (req, res) => {
 const updateAddress = async (req, res) => {
   const { addressId } = req.params;
   const fieldsToUpdate = req.body;
+  const userId = req.user._id;
 
   if (!addressId || Object.keys(fieldsToUpdate).length === 0)
     throw new BadRequestError(
       "updateAddress: Missing address id or fieldsToUpdate property in request"
     );
 
+  isValidAddressId(addressId);
+
   if ("user" in req.body)
     throw new BadRequestError(
-      "updateAddress: The user of an address cannot be modified"
+      "updateAddress: property 'user' cannot be modified"
     );
 
-  const updatedAddress = await updateAddressService(addressId, fieldsToUpdate);
-
-  if (!updatedAddress)
-    throw new NotFoundError("updateAddress: Address not found");
-
-  await UserModel.findByIdAndUpdate(updatedAddress.user, {
-    $pull: { addresses: addressId },
-  });
-
-  await UserModel.findByIdAndUpdate(updatedAddress.user, {
-    $push: { addresses: updatedAddress._id },
-  });
+  const updatedAddress = await updateAddressService(
+    userId,
+    addressId,
+    fieldsToUpdate
+  );
 
   return res.status(200).json({
     status: "success",
@@ -99,19 +81,15 @@ const updateAddress = async (req, res) => {
 };
 
 const deleteAddress = async (req, res) => {
+  const userId = req.user._id;
   const { addressId } = req.params;
 
   if (!addressId)
     throw new BadRequestError("deleteAddress: Missing address id");
 
-  const deletedAddress = await deleteAddressService(addressId);
+  isValidAddressId(addressId);
 
-  if (!deletedAddress)
-    throw new NotFoundError("deleteAddress: Address not found");
-
-  await UserModel.findByIdAndUpdate(deletedAddress.user, {
-    $pull: { addresses: addressId },
-  });
+  const deletedAddress = await deleteAddressService(userId, addressId);
 
   return res.status(200).json({
     status: "success",
@@ -121,10 +99,4 @@ const deleteAddress = async (req, res) => {
   });
 };
 
-export {
-  getAllAddress,
-  getAddressById,
-  createAddress,
-  updateAddress,
-  deleteAddress,
-};
+export { getAddressById, createAddress, updateAddress, deleteAddress };

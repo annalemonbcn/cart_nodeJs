@@ -1,15 +1,16 @@
 import { Router } from "express";
 import {
-  getAllAddress,
   getAddressById,
   createAddress,
   updateAddress,
-  deleteAddress
+  deleteAddress,
 } from "#controllers/address/address.controller.js";
+import { authenticateJwt } from "#middlewares/auth/index.js";
 
 const router = Router();
 
-router.get("/", getAllAddress);
+router.use(authenticateJwt);
+
 router.get("/:addressId", getAddressById);
 router.post("/", createAddress);
 router.put("/:addressId", updateAddress);

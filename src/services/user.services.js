@@ -5,7 +5,7 @@ import { validateUniqueEmail } from "#utils/validations.js";
 const getUserProfileByIdService = async (userId) => {
   const userProfile = await UserModel.findById(userId).select(
     "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
-  );
+  ).populate("addresses");
 
   if (!userProfile)
     throw new NotFoundError(`getUserProfileByIdService: User with id ${userId} doesn't exist`);
