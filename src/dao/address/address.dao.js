@@ -17,10 +17,10 @@ const unsetDefaultForUser = async (userId) =>
     { $set: { isDefault: false } }
   );
 
-const setDefaultAddress = async (addressId) =>
+const setDefaultStatus = async (addressId, isDefault) =>
   await AddressModel.findByIdAndUpdate(
     addressId,
-    { $set: { isDefault: true } },
+    { $set: { isDefault } },
     { new: true }
   );
 
@@ -32,7 +32,7 @@ const addressDAO = {
   createAddress,
   updateAddress,
   unsetDefaultForUser,
-  setDefaultAddress,
+  setDefaultStatus,
   deleteAddress,
 };
 

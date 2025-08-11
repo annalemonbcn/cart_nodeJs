@@ -3,8 +3,8 @@ import {
   getAddressById,
   createAddress,
   updateAddress,
-  setDefaultAddress,
   deleteAddress,
+  updateDefaultStatus,
 } from "#controllers/address/address.controller.js";
 import { authenticateJwt } from "#middlewares/auth/index.js";
 
@@ -15,7 +15,8 @@ router.use(authenticateJwt);
 router.post("/", createAddress);
 router.get("/:addressId", getAddressById);
 router.put("/:addressId", updateAddress);
-router.patch("/:addressId/default", setDefaultAddress);
 router.delete("/:addressId", deleteAddress);
+
+router.patch("/:addressId/default", updateDefaultStatus);
 
 export default router;

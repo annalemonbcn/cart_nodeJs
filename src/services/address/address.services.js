@@ -48,15 +48,16 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
   return updatedAddress;
 };
 
-const setDefaultAddressService = async (userId, addressId) => {
+const updateDefaultStatusService = async (userId, addressId, isDefault) => {
   const address = await addressDAO.getAddressById(addressId);
-  if (!address) throw new NotFoundError("setDefaultAddress: Address not found");
-
+  if (!address) throw new NotFoundError("Address not found");
   validateAddressBelongsToUser(address, userId);
 
-  await addressDAO.unsetDefaultForUser(userId);
+  if (isDefault) {
+    await addressDAO.unsetDefaultForUser(userId);
+  }
 
-  return await addressDAO.setDefaultAddress(addressId);
+  return await addressDAO.setDefaultStatus(addressId, isDefault);
 };
 
 const deleteAddressService = async (userId, addressId) => {
@@ -74,7 +75,7 @@ const addressServices = {
   getAddressByIdService,
   createAddressService,
   updateAddressService,
-  setDefaultAddressService,
+  updateDefaultStatusService,
   deleteAddressService,
 };
 

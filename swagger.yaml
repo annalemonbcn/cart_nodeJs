@@ -545,6 +545,35 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/adress/{addressId}/default:
+    patch:
+      tags:
+        - Address
+      summary: Update default address
+      description: Updates an address as default for the authenticated user
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: The ID of the address
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressDefaultInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AddressDefaultSet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -675,14 +704,10 @@ components:
           type: string
           example: "Springfield"
 
-    Address:
+    AddressBase:
       type: object
-      required: [user, firstName, lastName, deliveryAddress, phoneNumber]
+      required: [firstName, lastName, deliveryAddress, phoneNumber]
       properties:
-        user:
-          type: string
-          example: 64f1a2cfe2a83c0012345679
-          description: ObjectId referencing the user
         firstName:
           type: string
           example: "Jane"
@@ -704,6 +729,17 @@ components:
           items:
             type: string
             example: "home"
+
+    Address:
+      allOf:
+        - $ref: "#/components/schemas/AddressBase"
+        - type: object
+          required: [user]
+          properties:
+            user:
+              type: string
+              example: 64f1a2cfe2a83c0012345679
+              description: ObjectId referencing the user
 
     # 📥 "Inputs" = form inputs data shape
     RegisterUserInput:
@@ -768,7 +804,15 @@ components:
 
     AddressAddInput:
       allOf:
-        - $ref: "#/components/schemas/Address"
+        - $ref: "#/components/schemas/AddressBase"
+
+    AddressDefaultInput:
+      type: object
+      required: [isDefault]
+      properties:
+        isDefault:
+          type: boolean
+          example: true
 
     # 📤 "Outputs" = useful responses for the client
     ProductOutput:
@@ -1182,6 +1226,13 @@ components:
 
     AddressUpdated:
       description: Address successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AddressResponse"
+
+    AddressDefaultSet:
+      description: Default address successfully updated
       content:
         application/json:
           schema:
