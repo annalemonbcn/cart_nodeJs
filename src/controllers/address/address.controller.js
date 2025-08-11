@@ -1,34 +1,14 @@
 import { addressServices } from "#services/address/address.services.js";
-import UserModel from "#models/user.model.js";
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from "#utils/errors.js";
+import { BadRequestError } from "#utils/errors.js";
 import { isValidAddressId } from "#services/address/utils.js";
 
 const {
-  getAddressByIdService,
   createAddressService,
+  getAddressByIdService,
   updateAddressService,
+  updateDefaultStatusService,
   deleteAddressService,
 } = addressServices;
-
-const getAddressById = async (req, res) => {
-  const userId = req.user._id;
-  const { addressId } = req.params;
-
-  if (!addressId)
-    throw new BadRequestError("getAddressById: Missing address id");
-
-  isValidAddressId(addressId);
-
-  const address = await getAddressByIdService(addressId, userId);
-
-  return res
-    .status(200)
-    .json({ status: "success", code: 200, payload: address });
-};
 
 const createAddress = async (req, res) => {
   const userId = req.user._id;
@@ -47,6 +27,22 @@ const createAddress = async (req, res) => {
     message: "Address successfully created",
     payload: newAddress,
   });
+};
+
+const getAddressById = async (req, res) => {
+  const userId = req.user._id;
+  const { addressId } = req.params;
+
+  if (!addressId)
+    throw new BadRequestError("getAddressById: Missing address id");
+
+  isValidAddressId(addressId);
+
+  const address = await getAddressByIdService(addressId, userId);
+
+  return res
+    .status(200)
+    .json({ status: "success", code: 200, payload: address });
 };
 
 const updateAddress = async (req, res) => {
@@ -80,6 +76,31 @@ const updateAddress = async (req, res) => {
   });
 };
 
+const updateDefaultStatus = async (req, res) => {
+  const { addressId } = req.params;
+  const { isDefault } = req.body;
+  const userId = req.user._id;
+
+  if (!addressId)
+    throw new BadRequestError("updateDefaultStatus: Missing address id");
+
+  if (typeof isDefault !== "boolean")
+    throw new BadRequestError("updateDefaultStatus: isDefault must be boolean");
+
+  const updatedAddress = await updateDefaultStatusService(
+    userId,
+    addressId,
+    isDefault
+  );
+
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Default address status updated successfully",
+    payload: updatedAddress,
+  });
+};
+
 const deleteAddress = async (req, res) => {
   const userId = req.user._id;
   const { addressId } = req.params;
@@ -99,4 +120,10 @@ const deleteAddress = async (req, res) => {
   });
 };
 
-export { getAddressById, createAddress, updateAddress, deleteAddress };
+export {
+  getAddressById,
+  createAddress,
+  updateAddress,
+  updateDefaultStatus,
+  deleteAddress,
+};
