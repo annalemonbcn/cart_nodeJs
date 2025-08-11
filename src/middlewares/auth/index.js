@@ -1,15 +1,9 @@
-import "dotenv-flow/config";
 import passport from "passport";
+import { UnauthorizedError } from "#utils/errors.js";
 
 const authenticateJwt = (req, res, next) => {
   passport.authenticate("jwt-verify", { session: false }, (err, user) => {
-    if (err || !user) {
-      return res.status(401).json({
-        status: "error",
-        code: 401,
-        message: "Unauthorized",
-      });
-    }
+    if (err || !user) throw new UnauthorizedError("Unauthorized");
 
     req.user = user;
 

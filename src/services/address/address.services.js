@@ -1,10 +1,11 @@
 import AddressModel from "#models/address.model.js";
 import { NotFoundError } from "#utils/errors.js";
-
-const getAllAddressService = async () => {
-  const addresses = await AddressModel.find();
-  return addresses;
-};
+import { addressDAO } from "#dao/address/address.dao.js";
+import { userDAO } from "#dao/user/user.dao.js";
+import {
+  validateAddress,
+  validateUserHasLessThanFiveAddresses,
+} from "./utils.js";
 
 const getAddressByIdService = async (addressId) => {
   const address = await AddressModel.findById(addressId);
@@ -13,8 +14,20 @@ const getAddressByIdService = async (addressId) => {
   return address;
 };
 
-const createAddressService = async (address) => {
-  const newAddress = await AddressModel.create(address);
+const createAddressService = async (userId, addressData) => {
+  validateAddress(addressData);
+
+  const user = await userDAO.getUserById(userId);
+  if (!user) throw new NotFoundError("User not found");
+
+  validateUserHasLessThanFiveAddresses(user);
+
+  addressData.user = userId;
+
+  const newAddress = await addressDAO.createAddress(addressData);
+
+  await userDAO.addAddressToUser(userId, newAddress._id);
+
   return newAddress;
 };
 
@@ -33,13 +46,13 @@ const updateAddressService = async (addressId, fieldsToUpdate) => {
 
 const deleteAddressService = async (addressId) => {
   const deletedAddress = await AddressModel.findByIdAndDelete(addressId);
-  if (!deletedAddress) throw new NotFoundError("deleteAddress: Address not found");
+  if (!deletedAddress)
+    throw new NotFoundError("deleteAddress: Address not found");
 
   return deletedAddress;
 };
 
 const addressServices = {
-  getAllAddressService,
   getAddressByIdService,
   createAddressService,
   updateAddressService,

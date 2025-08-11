@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.get("/me", authenticateJwt, getCurrentUserProfile);
-router.put("/:uid", authenticateJwt, updateProfile);
-router.delete("/:uid", authenticateJwt, deleteProfile);
+router.put("/", authenticateJwt, updateProfile);
+router.delete("/", authenticateJwt, deleteProfile);
 
 export default router;

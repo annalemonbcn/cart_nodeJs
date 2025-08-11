@@ -405,19 +405,12 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /api/user/{uid}:
-    put: 
+  /api/user:
+    put:
       summary: Update user profile
       description: Updates the authenticated user's profile, excluding password and internal fields.
       tags:
         - User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: The ID of the user
-          schema:
-            type: string
       security:
         - bearerAuth: []
       requestBody:
@@ -445,13 +438,6 @@ paths:
       description: Deletes the authenticated user's profile.
       tags:
         - User
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: The ID of the user
-          schema:
-            type: string
       security:
         - bearerAuth: []
       responses:
@@ -465,7 +451,6 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-    
 
   /api/address:
     get:
@@ -514,6 +499,56 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AddressFound"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      tags:
+        - Address
+      summary: Update address by ID
+      description: Updates an address by ID
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: The ID of the address
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressAddInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/AddressUpdated"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Address
+      summary: Delete address by ID
+      description: Deletes an address by ID
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          description: The ID of the address
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/AddressDeleted"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -716,7 +751,7 @@ components:
 
     UserProfileInput:
       type: object
-      required: [firstName, lastName, email, addresses, _id]
+      required: [_id]
       properties:
         _id:
           type: string
@@ -741,6 +776,10 @@ components:
             type: string
             example: 64f1a2cfe2a83c0012345680
           description: ObjectId referencing an address
+
+    AddressAddInput:
+      allOf:
+        - $ref: "#/components/schemas/Address"
 
     # 📤 "Outputs" = useful responses for the client
     ProductOutput:
@@ -789,9 +828,7 @@ components:
           type: array
           maxItems: 5
           items:
-            type: string
-            example: 64f1a2cfe2a83c0012345680
-          description: ObjectId referencing an address
+            $ref: "#/components/schemas/AddressOutput"
 
     UserInternalOutput:
       type: object
@@ -826,6 +863,7 @@ components:
           format: date-time
           example: "2024-01-01T00:00:00.000Z"
 
+    # TODO: is user necessary in addressOutput?
     AddressOutput:
       allOf:
         - $ref: "#/components/schemas/Address"
@@ -1173,3 +1211,17 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AddressResponse"
+
+    AddressUpdated:
+      description: Address successfully updated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AddressResponse"
+
+    AddressDeleted:
+      description: Address successfully deleted
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeleteResponse"
