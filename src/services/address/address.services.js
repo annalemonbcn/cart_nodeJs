@@ -1,5 +1,4 @@
-import AddressModel from "#models/address.model.js";
-import { NotFoundError, UnauthorizedError } from "#utils/errors.js";
+import { NotFoundError } from "#utils/errors.js";
 import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import {
@@ -49,6 +48,17 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
   return updatedAddress;
 };
 
+const setDefaultAddressService = async (userId, addressId) => {
+  const address = await addressDAO.getAddressById(addressId);
+  if (!address) throw new NotFoundError("setDefaultAddress: Address not found");
+
+  validateAddressBelongsToUser(address, userId);
+
+  await addressDAO.unsetDefaultForUser(userId);
+
+  return await addressDAO.setDefaultAddress(addressId);
+};
+
 const deleteAddressService = async (userId, addressId) => {
   const address = await addressDAO.getAddressById(addressId);
   if (!address) throw new NotFoundError("deleteAddress: Address not found");
@@ -64,6 +74,7 @@ const addressServices = {
   getAddressByIdService,
   createAddressService,
   updateAddressService,
+  setDefaultAddressService,
   deleteAddressService,
 };
 
