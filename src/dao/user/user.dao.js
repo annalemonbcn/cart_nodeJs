@@ -9,9 +9,16 @@ const addAddressToUser = async (userId, addressId) => {
   return await getUserById(userId);
 };
 
+const removeAddressFromUser = async (userId, addressId) => {
+  return await UserModel.findByIdAndUpdate(userId, {
+    $pull: { addresses: addressId },
+  });
+};
+
 const userDAO = {
   getUserById,
   addAddressToUser,
+  removeAddressFromUser,
 };
 
 export { userDAO };

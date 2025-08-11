@@ -1,15 +1,19 @@
 import AddressModel from "#models/address.model.js";
-import { NotFoundError } from "#utils/errors.js";
+import { NotFoundError, UnauthorizedError } from "#utils/errors.js";
 import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import {
   validateAddress,
   validateUserHasLessThanFiveAddresses,
+  validateAddressBelongsToUser,
 } from "./utils.js";
 
-const getAddressByIdService = async (addressId) => {
-  const address = await AddressModel.findById(addressId);
-  if (!address) throw new NotFoundError("getAddressById: Address not found");
+const getAddressByIdService = async (addressId, userId) => {
+  const address = await addressDAO.getAddressById(addressId);
+  if (!address)
+    throw new NotFoundError("getAddressByIdService: Address not found");
+
+  validateAddressBelongsToUser(address, userId);
 
   return address;
 };
@@ -31,25 +35,29 @@ const createAddressService = async (userId, addressData) => {
   return newAddress;
 };
 
-const updateAddressService = async (addressId, fieldsToUpdate) => {
-  const options = { new: true, runValidators: true };
-  const updatedAddress = await AddressModel.findByIdAndUpdate(
+const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
+  const address = await addressDAO.getAddressById(addressId);
+  if (!address) throw new NotFoundError("updateAddress: Address not found");
+
+  validateAddressBelongsToUser(address, userId);
+
+  const updatedAddress = await addressDAO.updateAddress(
     addressId,
-    fieldsToUpdate,
-    options
+    fieldsToUpdate
   );
-  if (!updatedAddress)
-    throw new NotFoundError("updateAddress: Address not found");
 
   return updatedAddress;
 };
 
-const deleteAddressService = async (addressId) => {
-  const deletedAddress = await AddressModel.findByIdAndDelete(addressId);
-  if (!deletedAddress)
-    throw new NotFoundError("deleteAddress: Address not found");
+const deleteAddressService = async (userId, addressId) => {
+  const address = await addressDAO.getAddressById(addressId);
+  if (!address) throw new NotFoundError("deleteAddress: Address not found");
 
-  return deletedAddress;
+  validateAddressBelongsToUser(address, userId);
+
+  await userDAO.removeAddressFromUser(userId, addressId);
+
+  return await addressDAO.deleteAddress(addressId);
 };
 
 const addressServices = {

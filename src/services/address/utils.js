@@ -3,7 +3,8 @@ import {
   requiredFields,
   phoneRegex,
 } from "./constants.js";
-import { BadRequestError } from "#utils/errors.js";
+import { BadRequestError, UnauthorizedError } from "#utils/errors.js";
+import mongoose from "mongoose";
 
 const validateAddressFields = (addressData) => {
   for (const field of requiredFields) {
@@ -44,6 +45,20 @@ const validateUserHasLessThanFiveAddresses = (user) => {
   }
 };
 
+const validateAddressBelongsToUser = (address, userId) => {
+  if (address.user.toString() !== userId.toString()) {
+    throw new UnauthorizedError("Address does not belong to user");
+  }
+};
+
+const isValidAddressId = (addressId) => {
+  if (!mongoose.Types.ObjectId.isValid(addressId)) {
+    throw new BadRequestError("Invalid address id");
+  }
+
+  return true;
+};
+
 const validateAddress = (addressData) => {
   validateAddressFields(addressData);
   validateDeliveryAddressFields(addressData.deliveryAddress);
@@ -51,4 +66,9 @@ const validateAddress = (addressData) => {
   validateTags(addressData.tags);
 };
 
-export { validateAddress, validateUserHasLessThanFiveAddresses };
+export {
+  validateAddress,
+  validateUserHasLessThanFiveAddresses,
+  validateAddressBelongsToUser,
+  isValidAddressId,
+};

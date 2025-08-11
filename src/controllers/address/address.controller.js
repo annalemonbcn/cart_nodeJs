@@ -5,6 +5,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "#utils/errors.js";
+import { isValidAddressId } from "#services/address/utils.js";
 
 const {
   getAddressByIdService,
@@ -16,14 +17,13 @@ const {
 const getAddressById = async (req, res) => {
   const userId = req.user._id;
   const { addressId } = req.params;
+
   if (!addressId)
     throw new BadRequestError("getAddressById: Missing address id");
 
-  const address = await getAddressByIdService(addressId);
-  if (!address) throw new NotFoundError("getAddressById: Address not found");
+  isValidAddressId(addressId);
 
-  if (address.user.toString() !== userId)
-    throw new UnauthorizedError("getAddressById: Unauthorized");
+  const address = await getAddressByIdService(addressId, userId);
 
   return res
     .status(200)
@@ -52,31 +52,25 @@ const createAddress = async (req, res) => {
 const updateAddress = async (req, res) => {
   const { addressId } = req.params;
   const fieldsToUpdate = req.body;
+  const userId = req.user._id;
 
   if (!addressId || Object.keys(fieldsToUpdate).length === 0)
     throw new BadRequestError(
       "updateAddress: Missing address id or fieldsToUpdate property in request"
     );
 
+  isValidAddressId(addressId);
+
   if ("user" in req.body)
     throw new BadRequestError(
-      "updateAddress: The user of an address cannot be modified"
+      "updateAddress: property 'user' cannot be modified"
     );
 
-  const updatedAddress = await updateAddressService(addressId, fieldsToUpdate);
-  if (!updatedAddress)
-    throw new NotFoundError("updateAddress: Address not found");
-
-  if (updatedAddress.user.toString() !== userId)
-    throw new UnauthorizedError("updateAddress: Unauthorized");
-
-  await UserModel.findByIdAndUpdate(updatedAddress.user, {
-    $pull: { addresses: addressId },
-  });
-
-  await UserModel.findByIdAndUpdate(updatedAddress.user, {
-    $push: { addresses: updatedAddress._id },
-  });
+  const updatedAddress = await updateAddressService(
+    userId,
+    addressId,
+    fieldsToUpdate
+  );
 
   return res.status(200).json({
     status: "success",
@@ -86,23 +80,16 @@ const updateAddress = async (req, res) => {
   });
 };
 
-// TODO: implement soft delete
 const deleteAddress = async (req, res) => {
+  const userId = req.user._id;
   const { addressId } = req.params;
 
   if (!addressId)
     throw new BadRequestError("deleteAddress: Missing address id");
 
-  const deletedAddress = await deleteAddressService(addressId);
-  if (!deletedAddress)
-    throw new NotFoundError("deleteAddress: Address not found");
+  isValidAddressId(addressId);
 
-  if (deletedAddress.user.toString() !== userId)
-    throw new UnauthorizedError("deleteAddress: Unauthorized");
-
-  await UserModel.findByIdAndUpdate(deletedAddress.user, {
-    $pull: { addresses: addressId },
-  });
+  const deletedAddress = await deleteAddressService(userId, addressId);
 
   return res.status(200).json({
     status: "success",

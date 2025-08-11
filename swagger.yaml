@@ -453,17 +453,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
   /api/address:
-    get:
-      tags:
-        - Address
-      summary: Get all addresses
-      description: Returns all addresses from all users in DB
-      responses:
-        "200":
-          $ref: "#/components/responses/AllAddressFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
     post:
       tags:
         - Address
@@ -875,11 +864,6 @@ components:
               example: "64f1a2cfe2a83c0012345680"
               description: ObjectId of the address
 
-    AllAddressOutput:
-      type: array
-      items:
-        $ref: "#/components/schemas/AddressOutput"
-
     # 📡 Structured responses (standardized)
     BaseResponse:
       type: object
@@ -957,15 +941,6 @@ components:
           properties:
             payload:
               $ref: "#/components/schemas/LoginPayload"
-
-    AllAddressResponse:
-      allOf:
-        - $ref: "#/components/schemas/BaseResponse"
-        - type: object
-          required: [payload]
-          properties:
-            payload:
-              $ref: "#/components/schemas/AllAddressOutput"
 
     AddressResponse:
       allOf:
@@ -1191,13 +1166,6 @@ components:
             $ref: "#/components/schemas/DeleteResponse"
 
     # - Address responses
-    AllAddressFound:
-      description: Address found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/AllAddressResponse"
-
     AddressFound:
       description: Address found
       content:
