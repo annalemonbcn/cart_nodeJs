@@ -472,7 +472,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /api/adress/{addressId}:
+  /api/address/{addressId}:
     get:
       tags:
         - Address
@@ -545,7 +545,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /api/adress/{addressId}/default:
+  /api/address/{addressId}/default:
     patch:
       tags:
         - Address

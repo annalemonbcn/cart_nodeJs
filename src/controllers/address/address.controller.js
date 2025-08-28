@@ -110,13 +110,12 @@ const deleteAddress = async (req, res) => {
 
   isValidAddressId(addressId);
 
-  const deletedAddress = await deleteAddressService(userId, addressId);
+  await deleteAddressService(userId, addressId);
 
   return res.status(200).json({
     status: "success",
     code: 200,
     message: "Address deleted successfully",
-    payload: deletedAddress,
   });
 };
 
