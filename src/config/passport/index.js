@@ -4,13 +4,13 @@ import passportJWT from "passport-jwt";
 import bcrypt from "bcrypt";
 import "dotenv-flow/config";
 import UserModel from "#models/user.model.js";
-import {
-  validateEmail,
-  validateUniqueEmail,
-  validateStrongPassword,
-} from "#utils/validations.js";
 import passportGoogle from "passport-google-oauth20";
 import { AppError, BadRequestError, UnauthorizedError } from "#utils/errors.js";
+import { userDAO } from "#dao/user/user.dao.js";
+import {
+  loginSchemaValidation,
+  registerSchemaValidation,
+} from "./validations.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -23,37 +23,27 @@ const startPassport = () => {
         passReqToCallback: true,
       },
       async (req, username, password, done) => {
+        console.log("req.body", req.body);
         try {
-          let { firstName, lastName, phoneNumber, addresses } = req.body;
+          let { firstName, lastName } = req.body;
 
-          if (!firstName || !lastName)
-            return done(
-              new BadRequestError(
-                "register: First name and last name are required"
-              )
-            );
+          const { error } = registerSchemaValidation.validate({
+            firstName,
+            lastName,
+            email: username,
+            password,
+          });
+          if (error) throw new BadRequestError(error.details[0].message);
 
-          if (!validateEmail(username))
-            return done(new BadRequestError("register: Invalid email format"));
-
-          const isUnique = await validateUniqueEmail(username);
+          const isUnique = await userDAO.isEmailUnique(username);
           if (!isUnique)
             return done(new AppError("register: Email already in use", 409));
-
-          if (!validateStrongPassword(password))
-            return done(
-              new BadRequestError(
-                "register: Password must be at least 8 characters, include one uppercase letter and one special character"
-              )
-            );
 
           const user = await UserModel.create({
             firstName,
             lastName,
             email: username,
             password: bcrypt.hashSync(password, 10),
-            phoneNumber,
-            addresses,
           });
 
           return done(null, user);
@@ -72,11 +62,13 @@ const startPassport = () => {
       },
       async (username, password, done) => {
         try {
-          if (!validateEmail(username))
-            return done(new BadRequestError("login: Invalid email format"));
+          const { error } = loginSchemaValidation.validate({
+            email: username,
+            password,
+          });
+          if (error) throw new BadRequestError(error.details[0].message);
 
           const user = await UserModel.findOne({ email: username }).lean();
-
           if (!user || !bcrypt.compareSync(password, user.password))
             return done(
               new UnauthorizedError("login: Email or password is incorrect")
