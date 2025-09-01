@@ -10,7 +10,7 @@ import {
   addressSchemaValidation,
   editAddressSchemaValidation,
 } from "./validations.js";
-import mongoose from "mongoose";
+import { withTransaction } from "#services/utils.js";
 
 const getAddressByIdService = async (addressId, userId) => {
   const address = await addressDAO.getAddressById(addressId);
@@ -26,7 +26,7 @@ const createAddressService = async (userId, addressData) => {
   const { error } = addressSchemaValidation.validate(addressData);
   if (error) throw new BadRequestError(error.details[0].message);
 
-  const user = await userDAO.getUserById(userId);
+  const user = await userDAO.getActiveUserById(userId);
   if (!user) throw new NotFoundError("User not found");
 
   validateUserHasLessThanFiveAddresses(user.addresses);
@@ -50,7 +50,7 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
 
   validateAddressBelongsToUser(address, userId);
 
-  const user = await userDAO.getUserById(userId);
+  const user = await userDAO.getActiveUserById(userId);
   if (!user) throw new NotFoundError("User not found");
 
   validateIsUniqueDefaultAddress(
@@ -79,11 +79,8 @@ const updateDefaultStatusService = async (userId, addressId, isDefault) => {
   return await addressDAO.setDefaultStatus(addressId, isDefault);
 };
 
-const deleteAddressService = async (userId, addressId) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  try {
+const deleteAddressService = async (userId, addressId) =>
+  withTransaction(async (session) => {
     const address = await addressDAO.getAddressById(addressId, session);
     if (!address) throw new NotFoundError("deleteAddress: Address not found");
 
@@ -92,15 +89,7 @@ const deleteAddressService = async (userId, addressId) => {
     await userDAO.removeAddressFromUser(userId, addressId, session);
 
     await addressDAO.deleteAddress(addressId, session);
-
-    await session.commitTransaction();
-    session.endSession();
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
-  }
-};
+  });
 
 const addressServices = {
   getAddressByIdService,

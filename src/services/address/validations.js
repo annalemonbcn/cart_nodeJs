@@ -1,10 +1,8 @@
 import Joi from "joi";
-import {
-  mongoObjectIdRegex,
-  phoneRegex,
-  validCountries,
-  zipCodeRegex,
-} from "./constants.js";
+import { regex } from "#utils/regex.js";
+import { validCountries } from "./constants.js";
+
+const { zipCodeRegex, phoneRegex } = regex;
 
 const deliveryAddressSchemaValidation = Joi.object({
   street: Joi.string().required(),
