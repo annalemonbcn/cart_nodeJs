@@ -78,9 +78,6 @@ userSchema.set("toJSON", {
 
     if (Array.isArray(ret.addresses)) {
       ret.addresses = ret.addresses.map((addr) => {
-        addr.id = addr._id.toString();
-        delete addr._id;
-
         if (addr.deliveryAddress && addr.deliveryAddress._id) {
           delete addr.deliveryAddress._id;
         }

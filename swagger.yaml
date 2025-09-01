@@ -938,14 +938,13 @@ components:
           format: date-time
           example: "2024-01-01T00:00:00.000Z"
 
-    # TODO: is user necessary in addressOutput?
     AddressOutput:
       allOf:
         - $ref: "#/components/schemas/Address"
         - type: object
-          required: [_id]
+          required: [id]
           properties:
-            _id:
+            id:
               type: string
               example: "64f1a2cfe2a83c0012345680"
               description: ObjectId of the address
