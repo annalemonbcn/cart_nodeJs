@@ -1,8 +1,9 @@
 import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
-import { AppError, NotFoundError } from "#utils/errors.js";
+import { AppError, BadRequestError, NotFoundError } from "#utils/errors.js";
 import { withTransaction } from "../utils.js";
+import { updateUserProfileSchemaValidation } from "./validations.js";
 
 const getUserProfileByIdService = async (userId) => {
   const userProfile = await userDAO.getActiveUserById(userId);
@@ -14,6 +15,9 @@ const getUserProfileByIdService = async (userId) => {
 
 const updateUserProfileByIdService = async (userId, fieldsToUpdate) => {
   await getUserProfileByIdService(userId);
+
+  const { error } = updateUserProfileSchemaValidation.validate(fieldsToUpdate);
+  if (error) throw new BadRequestError(error.details[0].message);
 
   if (fieldsToUpdate.email) {
     const isUnique = await userDAO.isEmailUnique(fieldsToUpdate.email);
