@@ -20,6 +20,10 @@ const cartSchema = new mongoose.Schema({
     required: true,
     default: [],
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 const CartModel = mongoose.model(collectionNames.cartsCollection, cartSchema);

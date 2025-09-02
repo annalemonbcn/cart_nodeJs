@@ -669,6 +669,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CartProduct"
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
 
     User:
       type: object
@@ -767,6 +771,10 @@ components:
           items:
             type: string
             example: "home"
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2023-06-01T12:34:56.789Z"
 
     Address:
       allOf:

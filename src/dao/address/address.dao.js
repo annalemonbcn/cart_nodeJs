@@ -48,7 +48,14 @@ const setDefaultStatus = async (addressId, isDefault) =>
     { new: true }
   );
 
-const deleteAddress = async (addressId, options = {}) =>
+const softDelete = async (addressId, options = {}) =>
+  await AddressModel.findByIdAndUpdate(
+    addressId,
+    { deletedAt: new Date() },
+    options
+  );
+
+const hardDelete = async (addressId, options = {}) =>
   await AddressModel.findByIdAndDelete(addressId, options);
 
 const addressDAO = {
@@ -58,7 +65,8 @@ const addressDAO = {
   updateAddress,
   unsetDefaultForUser,
   setDefaultStatus,
-  deleteAddress,
+  softDelete,
+  hardDelete,
 };
 
 export { addressDAO };

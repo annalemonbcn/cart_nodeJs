@@ -42,8 +42,8 @@ const isEmailUnique = async (email) => {
   return !existingUser;
 };
 
-const softDelete = async (userId) =>
-  await UserModel.findByIdAndUpdate(userId, { deletedAt: new Date() });
+const softDelete = async (userId, options = {}) =>
+  await UserModel.findByIdAndUpdate(userId, { deletedAt: new Date() }, options);
 
 const hardDelete = async (userId, options = {}) =>
   await UserModel.findByIdAndDelete(userId, options);

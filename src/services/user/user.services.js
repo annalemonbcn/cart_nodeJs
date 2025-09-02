@@ -27,21 +27,31 @@ const updateUserProfileByIdService = async (userId, fieldsToUpdate) => {
   return await userDAO.updateUser(userId, fieldsToUpdate);
 };
 
-const softDeleteProfileByIdService = async (userId) => {
-  await getUserProfileByIdService(userId);
-  await userDAO.softDelete(userId);
-};
+const softDeleteProfileByIdService = async (userId) =>
+  withTransaction(async (session) => {
+    const user = await getUserProfileByIdService(userId);
+
+    if (user.cart) {
+      await cartDAO.softDelete(user.cart, { session });
+    }
+
+    for (const address of user.addresses) {
+      await addressDAO.softDelete(address, { session });
+    }
+
+    await userDAO.softDelete(userId, { session });
+  });
 
 const deleteProfileByIdService = async (userId) =>
   withTransaction(async (session) => {
     const user = await getUserProfileByIdService(userId);
 
     if (user.cart) {
-      await cartDAO.deleteCart(user.cart, { session });
+      await cartDAO.hardDelete(user.cart, { session });
     }
 
     for (const address of user.addresses) {
-      await addressDAO.deleteAddress(address, { session });
+      await addressDAO.hardDelete(address, { session });
     }
 
     await userDAO.hardDelete(userId, { session });
