@@ -433,9 +433,10 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/user/soft:
     delete:
-      summary: Delete user profile
-      description: Deletes the authenticated user's profile.
+      summary: Soft delete user profile
+      description: Soft deletes the authenticated user's profile, adding deletedAt field with current date
       tags:
         - User
       security:
@@ -447,6 +448,39 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/user/delete/{userId}/hard:
+    delete:
+      summary: Permanently delete a user profile (admin only)
+      description: |
+        Permanently deletes the specified user profile from the database.  
+        This action is irreversible and requires **admin** privileges.
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/UserProfileDeleted"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -680,6 +714,10 @@ components:
             type: string
             example: 64f1a2cfe2a83c0012345680
           description: ObjectId referencing an address
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2023-06-01T12:34:56.789Z"
 
     DeliveryAddress:
       type: object
@@ -778,7 +816,7 @@ components:
       type: object
       required: [_id]
       properties:
-        _id:
+        id:
           type: string
           example: "64f1a2cfe2a83c0012345679"
           description: ObjectId of the user
@@ -839,9 +877,9 @@ components:
 
     UserProfileOutput:
       type: object
-      required: [firstName, lastName, email, addresses, _id]
+      required: [_id, firstName, lastName, email, addresses]
       properties:
-        _id:
+        id:
           type: string
           example: "64f1a2cfe2a83c0012345679"
           description: ObjectId of the user
@@ -867,7 +905,7 @@ components:
       type: object
       required: [_id, email, role, authProvider, createdAt, updatedAt]
       properties:
-        _id:
+        id:
           type: string
           example: "64f1a2cfe2a83c0012345679"
           description: ObjectId of the user
@@ -895,15 +933,18 @@ components:
           type: string
           format: date-time
           example: "2024-01-01T00:00:00.000Z"
+        deletedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
 
-    # TODO: is user necessary in addressOutput?
     AddressOutput:
       allOf:
         - $ref: "#/components/schemas/Address"
         - type: object
-          required: [_id]
+          required: [id]
           properties:
-            _id:
+            id:
               type: string
               example: "64f1a2cfe2a83c0012345680"
               description: ObjectId of the address
@@ -1038,6 +1079,20 @@ components:
                 status: error
                 code: 401
                 message: Unauthorized
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            forbidden:
+              summary: Forbidden example
+              value:
+                status: error
+                code: 403
+                message: Forbidden
 
     RegisterBadRequest:
       description: Bad request – invalid or missing data

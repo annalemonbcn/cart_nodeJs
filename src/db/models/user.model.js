@@ -61,9 +61,34 @@ const userSchema = new mongoose.Schema(
       default: [],
       validate: [arrayLimit, "{PATH} exceeds the limit of 5"],
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
+
+userSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+
+    if (Array.isArray(ret.addresses)) {
+      ret.addresses = ret.addresses.map((addr) => {
+        if (addr.deliveryAddress && addr.deliveryAddress._id) {
+          delete addr.deliveryAddress._id;
+        }
+
+        return addr;
+      });
+    }
+
+    return ret;
+  },
+});
 
 const UserModel = mongoose.model(collectionNames.usersCollection, userSchema);
 

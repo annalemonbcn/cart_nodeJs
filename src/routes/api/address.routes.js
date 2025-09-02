@@ -6,17 +6,16 @@ import {
   deleteAddress,
   updateDefaultStatus,
 } from "#controllers/address/address.controller.js";
-import { authenticateJwt } from "#middlewares/auth/index.js";
+import { authenticateAndAuthorize } from "#middlewares/auth/index.js";
 
 const router = Router();
 
-router.use(authenticateJwt);
+router.use(authenticateAndAuthorize());
 
 router.post("/", createAddress);
 router.get("/:addressId", getAddressById);
 router.put("/:addressId", updateAddress);
 router.delete("/:addressId", deleteAddress);
-
 router.patch("/:addressId/default", updateDefaultStatus);
 
 export default router;

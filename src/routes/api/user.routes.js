@@ -1,15 +1,23 @@
 import { Router } from "express";
-import { authenticateJwt } from "#middlewares/auth/index.js";
+import { authenticateAndAuthorize } from "#middlewares/auth/index.js";
 import {
   getCurrentUserProfile,
   updateProfile,
+  softDeleteProfile,
   deleteProfile,
 } from "#controllers/user/user.controller.js";
 
 const router = Router();
 
-router.get("/me", authenticateJwt, getCurrentUserProfile);
-router.put("/", authenticateJwt, updateProfile);
-router.delete("/", authenticateJwt, deleteProfile);
+router.use(authenticateAndAuthorize());
+
+router.get("/me", getCurrentUserProfile);
+router.put("/", updateProfile);
+router.delete("/delete/soft", softDeleteProfile);
+router.delete(
+  "/delete/:userId/hard",
+  authenticateAndAuthorize("admin"),
+  deleteProfile
+);
 
 export default router;

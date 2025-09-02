@@ -48,9 +48,8 @@ const setDefaultStatus = async (addressId, isDefault) =>
     { new: true }
   );
 
-const deleteAddress = async (addressId, session) => {
-  return await AddressModel.findByIdAndDelete(addressId, { session });
-};
+const deleteAddress = async (addressId, options = {}) =>
+  await AddressModel.findByIdAndDelete(addressId, options);
 
 const addressDAO = {
   getAddressById,

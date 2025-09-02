@@ -1,14 +1,20 @@
 import passport from "passport";
-import { UnauthorizedError } from "#utils/errors.js";
+import { ForbiddenError, UnauthorizedError } from "#utils/errors.js";
 
-const authenticateJwt = (req, res, next) => {
-  passport.authenticate("jwt-verify", { session: false }, (err, user) => {
-    if (err || !user) throw new UnauthorizedError("Unauthorized");
+const authenticateAndAuthorize =
+  (...allowedRoles) =>
+  (req, res, next) => {
+    passport.authenticate("jwt-verify", { session: false }, (err, user) => {
+      if (err || !user) return next(new UnauthorizedError("Unauthorized"));
 
-    req.user = user;
+      req.user = user;
 
-    next();
-  })(req, res, next);
-};
+      if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+        return next(new ForbiddenError("Forbidden: Insufficient permissions"));
+      }
 
-export { authenticateJwt };
+      next();
+    })(req, res, next);
+  };
+
+export { authenticateAndAuthorize };

@@ -1,6 +1,6 @@
 import { authServices } from "#services/auth.services.js";
-import { cleanUser, generateToken } from "./utils.js";
-import { AppError, BadRequestError, UnauthorizedError } from "#utils/errors.js";
+import { generateToken } from "./utils.js";
+import { BadRequestError } from "#utils/errors.js";
 
 const { registerUserService, loginUserService } = authServices;
 
@@ -13,12 +13,11 @@ const registerUser = async (req, res, next) => {
 
     if (error) throw error;
 
-    const userObj = cleanUser(user);
     return res.status(201).json({
       status: "success",
       code: 201,
       message: "User successfully created",
-      payload: userObj,
+      payload: user,
     });
   } catch (error) {
     next(error);
@@ -31,11 +30,14 @@ const loginUser = async (req, res, next) => {
 
   try {
     const { error, user } = await loginUserService(req);
-
     if (error) throw error;
 
-    const userObj = cleanUser(user);
-    const token = generateToken(userObj);
+    const token = generateToken({
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+    });
+
     return res.status(200).json({
       status: "success",
       code: 200,
@@ -50,7 +52,11 @@ const loginUser = async (req, res, next) => {
 const FRONT_URL = "http://localhost:5173";
 
 const googleCallback = (req, res) => {
-  const token = generateToken({ _id: req.user._id });
+  const token = generateToken({
+    _id: req.user._id,
+    email: req.user.email,
+    role: req.user.role,
+  });
   res.redirect(`${FRONT_URL}/auth/success?token=${token}`);
 };
 

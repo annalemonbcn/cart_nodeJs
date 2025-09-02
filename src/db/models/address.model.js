@@ -57,6 +57,21 @@ const addressSchema = new mongoose.Schema({
   },
 });
 
+addressSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    ret.id = ret._id.toString();
+    delete ret._id;
+
+    if (ret.deliveryAddress && ret.deliveryAddress._id) {
+      delete ret.deliveryAddress._id;
+    }
+
+    return ret;
+  },
+});
+
 const AddressModel = mongoose.model(
   collectionNames.addressesCollection,
   addressSchema
