@@ -33,7 +33,7 @@ const loginUser = async (req, res, next) => {
     if (error) throw error;
 
     const token = generateToken({
-      _id: user._id,
+      id: user._id,
       email: user.email,
       role: user.role,
     });
@@ -53,7 +53,7 @@ const FRONT_URL = "http://localhost:5173";
 
 const googleCallback = (req, res) => {
   const token = generateToken({
-    _id: req.user._id,
+    id: req.user._id,
     email: req.user.email,
     role: req.user.role,
   });

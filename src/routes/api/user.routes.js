@@ -13,11 +13,7 @@ router.use(authenticateAndAuthorize());
 
 router.get("/me", getCurrentUserProfile);
 router.put("/", updateProfile);
-router.delete("/delete/soft", softDeleteProfile);
-router.delete(
-  "/delete/:userId/hard",
-  authenticateAndAuthorize("admin"),
-  deleteProfile
-);
+router.delete("/soft", softDeleteProfile);
+router.delete(":userId/hard", authenticateAndAuthorize("admin"), deleteProfile);
 
 export default router;

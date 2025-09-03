@@ -223,28 +223,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-    delete:
-      tags:
-        - Carts
-      summary: Delete cart by ID
-      description: Deletes a cart by ID
-      parameters:
-        - name: cid
-          in: path
-          required: true
-          description: The ID of the cart
-          schema:
-            type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/CartDeleted"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
   /api/carts/{cid}/product/{pid}:
     post:
       tags:
@@ -455,7 +433,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /api/user/delete/{userId}/hard:
+  /api/user/{userId}/hard:
     delete:
       summary: Permanently delete a user profile (admin only)
       description: |
@@ -876,9 +854,9 @@ components:
       allOf:
         - $ref: "#/components/schemas/Cart"
         - type: object
-          required: [_id]
+          required: [id]
           properties:
-            _id:
+            id:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
               description: ObjectId of the cart

@@ -14,8 +14,7 @@ import { withTransaction } from "#services/utils.js";
 
 const getAddressByIdService = async (addressId, userId) => {
   const address = await addressDAO.getAddressById(addressId);
-  if (!address)
-    throw new NotFoundError("getAddressByIdService: Address not found");
+  if (!address) throw new NotFoundError("Address not found");
 
   validateAddressBelongsToUser(address, userId);
 
