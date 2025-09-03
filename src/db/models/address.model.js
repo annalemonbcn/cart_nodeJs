@@ -55,6 +55,10 @@ const addressSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 });
 
 addressSchema.set("toJSON", {

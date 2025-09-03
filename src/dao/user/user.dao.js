@@ -1,5 +1,10 @@
 import UserModel from "#models/user.model.js";
 
+const createUser = async (user, options = {}) => {
+  const users = await UserModel.create([user], options);
+  return users[0];
+};
+
 const getUserById = async (userId) =>
   await UserModel.findById(userId)
     .select(
@@ -14,13 +19,18 @@ const getActiveUserById = async (userId) =>
     )
     .populate("addresses");
 
-const updateUser = async (userId, fieldsToUpdate) =>
+const getActiveUserByEmail = async (email) =>
+  await UserModel.findOne({ email, deletedAt: null });
+
+const getActiveUserByGoogleId = async (googleId) =>
+  await UserModel.findOne({ googleId, deletedAt: null });
+
+const updateUser = async (userId, fieldsToUpdate, options = {}) =>
   await UserModel.findByIdAndUpdate(userId, fieldsToUpdate, {
     new: true,
     runValidators: true,
-  }).select(
-    "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
-  );
+    ...options,
+  });
 
 const addAddressToUser = async (userId, addressId) => {
   await UserModel.findByIdAndUpdate(userId, {
@@ -42,15 +52,18 @@ const isEmailUnique = async (email) => {
   return !existingUser;
 };
 
-const softDelete = async (userId) =>
-  await UserModel.findByIdAndUpdate(userId, { deletedAt: new Date() });
+const softDelete = async (userId, options = {}) =>
+  await UserModel.findByIdAndUpdate(userId, { deletedAt: new Date() }, options);
 
 const hardDelete = async (userId, options = {}) =>
   await UserModel.findByIdAndDelete(userId, options);
 
 const userDAO = {
+  createUser,
   getUserById,
   getActiveUserById,
+  getActiveUserByEmail,
+  getActiveUserByGoogleId,
   updateUser,
   addAddressToUser,
   removeAddressFromUser,

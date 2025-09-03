@@ -10,12 +10,11 @@ import {
   addressSchemaValidation,
   editAddressSchemaValidation,
 } from "./validations.js";
-import { withTransaction } from "#services/utils.js";
+import { withTransaction } from "#utils/transactions.js";
 
 const getAddressByIdService = async (addressId, userId) => {
   const address = await addressDAO.getAddressById(addressId);
-  if (!address)
-    throw new NotFoundError("getAddressByIdService: Address not found");
+  if (!address) throw new NotFoundError("Address not found");
 
   validateAddressBelongsToUser(address, userId);
 

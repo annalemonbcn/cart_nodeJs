@@ -3,16 +3,15 @@ import { BadRequestError } from "#utils/errors.js";
 
 const {
   createCartService,
-  getCartService,
   addProductToCartService,
   replaceProductsService,
   updateQuantityService,
-  deleteCartService,
   deleteProductFromCartService,
 } = cartServices;
 
 const createCart = async (req, res) => {
   const cart = {
+    user: req.user.id,
     products: [],
   };
 
@@ -26,103 +25,87 @@ const createCart = async (req, res) => {
   });
 };
 
-const getCartById = async (req, res) => {
-  const { cid } = req.params;
-  if (!cid)
-    throw new BadRequestError("getCartById: Missing cart id in request params");
-
-  const cart = await getCartService(cid, { populate: true, lean: true });
-
-  return res.status(200).json({ status: "success", code: 200, payload: cart });
-};
+const getCartById = async (req, res) =>
+  res.status(200).json({
+    status: "success",
+    message: "Cart retrieved successfully",
+    code: 200,
+    payload: req.cart,
+  });
 
 const addProductToCart = async (req, res) => {
-  const { cid, pid } = req.params;
-
-  if (!cid || !pid) {
-    throw new BadRequestError(
-      "addProductToCart: Missing cart id or product id in request params"
-    );
+  const { pid } = req.params;
+  if (!pid) {
+    throw new BadRequestError("Missing product id in request params");
   }
 
-  const updatedCart = await addProductToCartService(cid, pid);
+  const updatedCart = await addProductToCartService(req.cart.id, pid);
 
   return res.status(200).json({
     status: "success",
     code: 200,
-    message: `Product ${pid} added successfully to cart ${cid}`,
-    payload: updatedCart,
-  });
-};
-
-const replaceProducts = async (req, res) => {
-  const { cid } = req.params;
-  const { products } = req.body;
-
-  if (!cid || Object.keys(products).length === 0) {
-    throw new BadRequestError(
-      "replaceProducts: Missing cart id or products in request body"
-    );
-  }
-
-  const updatedCart = await replaceProductsService(cid, products);
-
-  return res.status(200).json({
-    status: "success",
-    code: 200,
-    message: `Cart ${cid} updated successfully`,
+    message: `Product ${pid} added successfully to cart ${req.cart.id}`,
     payload: updatedCart,
   });
 };
 
 const updateProductQty = async (req, res) => {
-  const { cid, pid } = req.params;
-  const { quantity } = req.body;
+  const { pid } = req.params;
+  const body = req.body || {};
+  const { quantity } = body;
 
-  if (!cid || !pid || !quantity)
-    throw new BadRequestError(
-      "updateProductQty: Missing cart id, or product id, or quantity in request"
-    );
+  if (!pid || !quantity)
+    throw new BadRequestError("Missing product id or quantity in request");
 
-  const updatedCart = await updateQuantityService(cid, pid, quantity);
+  const updatedCart = await updateQuantityService(req.cart.id, pid, quantity);
 
   return res.status(200).json({
     status: "success",
     code: 200,
-    message: `Quantity updated to ${quantity} for product ${pid} in cart ${cid}`,
+    message: `Quantity updated to ${quantity} for product ${pid} in cart ${req.cart.id}`,
     payload: updatedCart,
   });
 };
 
-const deleteCart = async (req, res) => {
-  const { cid } = req.params;
+const replaceProducts = async (req, res) => {
+  const body = req.body || {};
+  const { products } = body;
 
-  if (!cid)
-    throw new BadRequestError("deleteCart: Missing cart id in request params");
+  if (!products || Object.keys(products).length === 0) {
+    throw new BadRequestError("Missing products in request");
+  }
 
-  await deleteCartService(cid);
+  for (const item of products) {
+    if (!item.product || typeof item.quantity !== "number") {
+      throw new BadRequestError(
+        "Each product must have a product id and a numeric quantity"
+      );
+    }
+  }
+
+  const updatedCart = await replaceProductsService(req.cart.id, products);
 
   return res.status(200).json({
     status: "success",
     code: 200,
-    message: `Cart ${cid} has been successfully deleted`,
+    message: `Cart ${req.cart.id} updated successfully`,
+    payload: updatedCart,
   });
 };
 
 const deleteProductFromCart = async (req, res) => {
-  const { cid, pid } = req.params;
-
-  if (!cid || !pid)
+  const { pid } = req.params;
+  if (!pid)
     throw new BadRequestError(
-      "deleteProductFromCart: Missing cart id or product id in request params"
+      "deleteProductFromCart: Missing product id in request params"
     );
 
-  const cart = await deleteProductFromCartService(cid, pid);
+  const cart = await deleteProductFromCartService(req.cart.id, pid);
 
   return res.status(200).json({
     status: "success",
     code: 200,
-    message: `Product ${pid} successfully deleted from cart ${cid}`,
+    message: `Product ${pid} successfully deleted from cart ${req.cart.id}`,
     payload: cart,
   });
 };
@@ -133,6 +116,5 @@ export {
   addProductToCart,
   updateProductQty,
   replaceProducts,
-  deleteCart,
   deleteProductFromCart,
 };

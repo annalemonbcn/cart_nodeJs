@@ -4,9 +4,23 @@ import { BadRequestError } from "#utils/errors.js";
 
 const { registerUserService, loginUserService } = authServices;
 
+const sanitizeUser = (user) => {
+  const toJSON = user.toJSON();
+
+  return {
+    id: toJSON.id,
+    firstName: toJSON.firstName,
+    lastName: toJSON.lastName,
+    email: toJSON.email,
+    phoneNumber: toJSON.phoneNumber,
+    cart: toJSON.cart,
+    addresses: toJSON.addresses,
+  };
+};
+
 const registerUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    throw new BadRequestError("registerUser: Missing user data in request");
+    throw new BadRequestError("Missing user data in request");
 
   try {
     const { error, user } = await registerUserService(req);
@@ -17,7 +31,7 @@ const registerUser = async (req, res, next) => {
       status: "success",
       code: 201,
       message: "User successfully created",
-      payload: user,
+      payload: sanitizeUser(user),
     });
   } catch (error) {
     next(error);
@@ -26,14 +40,14 @@ const registerUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    throw new BadRequestError("loginUser: Missing user data in request");
+    throw new BadRequestError("Missing user data in request");
 
   try {
     const { error, user } = await loginUserService(req);
     if (error) throw error;
 
     const token = generateToken({
-      _id: user._id,
+      id: user._id,
       email: user.email,
       role: user.role,
     });
@@ -53,7 +67,7 @@ const FRONT_URL = "http://localhost:5173";
 
 const googleCallback = (req, res) => {
   const token = generateToken({
-    _id: req.user._id,
+    id: req.user._id,
     email: req.user.email,
     role: req.user.role,
   });

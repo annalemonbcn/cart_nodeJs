@@ -2,7 +2,7 @@ import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
 import { AppError, BadRequestError, NotFoundError } from "#utils/errors.js";
-import { withTransaction } from "../utils.js";
+import { withTransaction } from "#utils/transactions.js";
 import { updateUserProfileSchemaValidation } from "./validations.js";
 
 const getUserProfileByIdService = async (userId) => {
@@ -27,21 +27,32 @@ const updateUserProfileByIdService = async (userId, fieldsToUpdate) => {
   return await userDAO.updateUser(userId, fieldsToUpdate);
 };
 
-const softDeleteProfileByIdService = async (userId) => {
-  await getUserProfileByIdService(userId);
-  await userDAO.softDelete(userId);
-};
-
-const deleteProfileByIdService = async (userId) =>
+const softDeleteProfileByIdService = async (userId) =>
   withTransaction(async (session) => {
     const user = await getUserProfileByIdService(userId);
 
     if (user.cart) {
-      await cartDAO.deleteCart(user.cart, { session });
+      await cartDAO.softDelete(user.cart, { session });
     }
 
     for (const address of user.addresses) {
-      await addressDAO.deleteAddress(address, { session });
+      await addressDAO.softDelete(address, { session });
+    }
+
+    await userDAO.softDelete(userId, { session });
+  });
+
+const deleteProfileByIdService = async (userId) =>
+  withTransaction(async (session) => {
+    const user = await userDAO.getUserById(userId);
+    if (!user) throw new NotFoundError(`User with id ${userId} doesn't exist`);
+
+    if (user.cart) {
+      await cartDAO.hardDelete(user.cart, { session });
+    }
+
+    for (const address of user.addresses) {
+      await addressDAO.hardDelete(address, { session });
     }
 
     await userDAO.hardDelete(userId, { session });
