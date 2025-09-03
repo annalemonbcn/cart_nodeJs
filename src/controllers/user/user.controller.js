@@ -55,14 +55,14 @@ const softDeleteProfile = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-  const { userId: userIdParam } = req.params;
-  if (!userIdParam) throw new BadRequestError("Invalid user id");
+  const { userId: userIdToRemove } = req.params;
+  if (!userIdToRemove) throw new BadRequestError("Invalid user id");
 
-  if (req.user._id === userIdParam) {
+  if (req.user.id === userIdToRemove) {
     throw new BadRequestError("Admin cannot delete themselves");
   }
 
-  await deleteProfileByIdService(userIdParam);
+  await deleteProfileByIdService(userIdToRemove);
 
   res.status(200).json({
     status: "success",

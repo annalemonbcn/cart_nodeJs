@@ -25,6 +25,7 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: collectionNames.usersCollection,
       required: true,
+      unique: true,
     },
     products: {
       type: [productSchema],

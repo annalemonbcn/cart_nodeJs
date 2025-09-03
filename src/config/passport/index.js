@@ -11,6 +11,7 @@ import {
   registerSchemaValidation,
 } from "./validations.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
+import { withTransaction } from "#utils/transactions.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -37,20 +38,33 @@ const startPassport = () => {
           const isUnique = await userDAO.isEmailUnique(username);
           if (!isUnique) return done(new AppError("Email already in use", 409));
 
-          const user = await userDAO.createUser({
-            firstName,
-            lastName,
-            email: username,
-            password: bcrypt.hashSync(password, 10),
-          });
+          const user = await withTransaction(async (session) => {
+            const newUser = await userDAO.createUser(
+              {
+                firstName,
+                lastName,
+                email: username,
+                password: bcrypt.hashSync(password, 10),
+              },
+              { session }
+            );
 
-          const cart = await cartDAO.createCart({
-            user: user._id,
-            products: [],
-          });
+            const cart = await cartDAO.createCart(
+              {
+                user: newUser._id,
+                products: [],
+              },
+              { session }
+            );
 
-          user.cart = cart._id;
-          await user.save();
+            const userUpdated = await userDAO.updateUser(
+              newUser._id,
+              { cart: cart._id },
+              { session }
+            );
+
+            return userUpdated;
+          });
 
           return done(null, user);
         } catch (error) {
@@ -77,7 +91,7 @@ const startPassport = () => {
           const user = await userDAO.getActiveUserByEmail(username);
           if (!user || !bcrypt.compareSync(password, user.password))
             return done(
-              new UnauthorizedError("login: Email or password is incorrect")
+              new UnauthorizedError("Email or password is incorrect")
             );
 
           return done(null, user);
@@ -124,21 +138,34 @@ const startPassport = () => {
 
           // ? También podrías buscar por email para "vincular" cuentas si es el mismo usuario
           if (!user) {
-            user = await userDAO.createUser({
-              googleId,
-              email,
-              firstName,
-              lastName,
-              authProvider: "google",
-            });
+            user = await withTransaction(async (session) => {
+              const newUser = await userDAO.createUser(
+                {
+                  googleId,
+                  email,
+                  firstName,
+                  lastName,
+                  authProvider: "google",
+                },
+                { session }
+              );
 
-            const cart = await cartDAO.createCart({
-              user: user._id,
-              products: [],
-            });
+              const cart = await cartDAO.createCart(
+                {
+                  user: newUser._id,
+                  products: [],
+                },
+                { session }
+              );
 
-            user.cart = cart._id;
-            await user.save();
+              const updatedUser = await userDAO.updateUser(
+                newUser._id,
+                { cart: cart._id },
+                { session }
+              );
+
+              return updatedUser;
+            });
           }
 
           return done(null, user);

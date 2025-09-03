@@ -1,7 +1,10 @@
 import CartModel from "#models/cart.model.js";
 import { NotFoundError } from "#utils/errors.js";
 
-const createCart = async (cartData) => await CartModel.create(cartData);
+const createCart = async (cartData, options = {}) => {
+  const carts = await CartModel.create([cartData], options);
+  return carts[0];
+};
 
 const getCartById = async (cartId) =>
   await CartModel.findById(cartId).populate("products.product");
@@ -68,6 +71,12 @@ const deleteProductFromCart = async (cartId, productId) => {
   return cart;
 };
 
+const softDelete = async (cartId, options = {}) =>
+  await CartModel.findByIdAndUpdate(cartId, { deletedAt: new Date() }, options);
+
+const hardDelete = async (cartId, options = {}) =>
+  await CartModel.findByIdAndDelete(cartId, options);
+
 const cartDAO = {
   createCart,
   getCartById,
@@ -75,6 +84,8 @@ const cartDAO = {
   replaceProducts,
   updateQuantity,
   deleteProductFromCart,
+  softDelete,
+  hardDelete,
 };
 
 export { cartDAO };

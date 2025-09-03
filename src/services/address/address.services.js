@@ -10,7 +10,7 @@ import {
   addressSchemaValidation,
   editAddressSchemaValidation,
 } from "./validations.js";
-import { withTransaction } from "#services/utils.js";
+import { withTransaction } from "#utils/transactions.js";
 
 const getAddressByIdService = async (addressId, userId) => {
   const address = await addressDAO.getAddressById(addressId);

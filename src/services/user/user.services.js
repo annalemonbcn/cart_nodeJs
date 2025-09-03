@@ -2,7 +2,7 @@ import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
 import { AppError, BadRequestError, NotFoundError } from "#utils/errors.js";
-import { withTransaction } from "../utils.js";
+import { withTransaction } from "#utils/transactions.js";
 import { updateUserProfileSchemaValidation } from "./validations.js";
 
 const getUserProfileByIdService = async (userId) => {
@@ -44,7 +44,8 @@ const softDeleteProfileByIdService = async (userId) =>
 
 const deleteProfileByIdService = async (userId) =>
   withTransaction(async (session) => {
-    const user = await getUserProfileByIdService(userId);
+    const user = await userDAO.getUserById(userId);
+    if (!user) throw new NotFoundError(`User with id ${userId} doesn't exist`);
 
     if (user.cart) {
       await cartDAO.hardDelete(user.cart, { session });

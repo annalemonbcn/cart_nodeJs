@@ -1,6 +1,9 @@
 import UserModel from "#models/user.model.js";
 
-const createUser = async (user) => await UserModel.create(user);
+const createUser = async (user, options = {}) => {
+  const users = await UserModel.create([user], options);
+  return users[0];
+};
 
 const getUserById = async (userId) =>
   await UserModel.findById(userId)
@@ -22,13 +25,12 @@ const getActiveUserByEmail = async (email) =>
 const getActiveUserByGoogleId = async (googleId) =>
   await UserModel.findOne({ googleId, deletedAt: null });
 
-const updateUser = async (userId, fieldsToUpdate) =>
+const updateUser = async (userId, fieldsToUpdate, options = {}) =>
   await UserModel.findByIdAndUpdate(userId, fieldsToUpdate, {
     new: true,
     runValidators: true,
-  }).select(
-    "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
-  );
+    ...options,
+  });
 
 const addAddressToUser = async (userId, addressId) => {
   await UserModel.findByIdAndUpdate(userId, {

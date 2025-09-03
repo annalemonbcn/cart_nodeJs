@@ -4,6 +4,20 @@ import { BadRequestError } from "#utils/errors.js";
 
 const { registerUserService, loginUserService } = authServices;
 
+const sanitizeUser = (user) => {
+  const toJSON = user.toJSON();
+
+  return {
+    id: toJSON.id,
+    firstName: toJSON.firstName,
+    lastName: toJSON.lastName,
+    email: toJSON.email,
+    phoneNumber: toJSON.phoneNumber,
+    cart: toJSON.cart,
+    addresses: toJSON.addresses,
+  };
+};
+
 const registerUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
     throw new BadRequestError("Missing user data in request");
@@ -17,7 +31,7 @@ const registerUser = async (req, res, next) => {
       status: "success",
       code: 201,
       message: "User successfully created",
-      payload: user,
+      payload: sanitizeUser(user),
     });
   } catch (error) {
     next(error);
