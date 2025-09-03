@@ -6,7 +6,7 @@ const { registerUserService, loginUserService } = authServices;
 
 const registerUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    throw new BadRequestError("registerUser: Missing user data in request");
+    throw new BadRequestError("Missing user data in request");
 
   try {
     const { error, user } = await registerUserService(req);
@@ -26,7 +26,7 @@ const registerUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
   if (!Object.keys(req.body).length)
-    throw new BadRequestError("loginUser: Missing user data in request");
+    throw new BadRequestError("Missing user data in request");
 
   try {
     const { error, user } = await loginUserService(req);

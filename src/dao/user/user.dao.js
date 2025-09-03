@@ -1,5 +1,7 @@
 import UserModel from "#models/user.model.js";
 
+const createUser = async (user) => await UserModel.create(user);
+
 const getUserById = async (userId) =>
   await UserModel.findById(userId)
     .select(
@@ -13,6 +15,12 @@ const getActiveUserById = async (userId) =>
       "-password -role -googleId -authProvider -createdAt -updatedAt -__v"
     )
     .populate("addresses");
+
+const getActiveUserByEmail = async (email) =>
+  await UserModel.findOne({ email, deletedAt: null });
+
+const getActiveUserByGoogleId = async (googleId) =>
+  await UserModel.findOne({ googleId, deletedAt: null });
 
 const updateUser = async (userId, fieldsToUpdate) =>
   await UserModel.findByIdAndUpdate(userId, fieldsToUpdate, {
@@ -49,8 +57,11 @@ const hardDelete = async (userId, options = {}) =>
   await UserModel.findByIdAndDelete(userId, options);
 
 const userDAO = {
+  createUser,
   getUserById,
   getActiveUserById,
+  getActiveUserByEmail,
+  getActiveUserByGoogleId,
   updateUser,
   addAddressToUser,
   removeAddressFromUser,

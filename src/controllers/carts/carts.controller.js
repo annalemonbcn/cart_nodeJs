@@ -9,7 +9,6 @@ const {
   deleteProductFromCartService,
 } = cartServices;
 
-// TODO: make sure that this is called when a user is created
 const createCart = async (req, res) => {
   const cart = {
     user: req.user.id,

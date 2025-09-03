@@ -3,7 +3,6 @@ import passportLocal from "passport-local";
 import passportJWT from "passport-jwt";
 import bcrypt from "bcrypt";
 import "dotenv-flow/config";
-import UserModel from "#models/user.model.js";
 import passportGoogle from "passport-google-oauth20";
 import { AppError, BadRequestError, UnauthorizedError } from "#utils/errors.js";
 import { userDAO } from "#dao/user/user.dao.js";
@@ -11,6 +10,7 @@ import {
   loginSchemaValidation,
   registerSchemaValidation,
 } from "./validations.js";
+import { cartDAO } from "#dao/cart/cart.dao.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -23,7 +23,6 @@ const startPassport = () => {
         passReqToCallback: true,
       },
       async (req, username, password, done) => {
-        console.log("req.body", req.body);
         try {
           let { firstName, lastName } = req.body;
 
@@ -36,15 +35,22 @@ const startPassport = () => {
           if (error) throw new BadRequestError(error.details[0].message);
 
           const isUnique = await userDAO.isEmailUnique(username);
-          if (!isUnique)
-            return done(new AppError("register: Email already in use", 409));
+          if (!isUnique) return done(new AppError("Email already in use", 409));
 
-          const user = await UserModel.create({
+          const user = await userDAO.createUser({
             firstName,
             lastName,
             email: username,
             password: bcrypt.hashSync(password, 10),
           });
+
+          const cart = await cartDAO.createCart({
+            user: user._id,
+            products: [],
+          });
+
+          user.cart = cart._id;
+          await user.save();
 
           return done(null, user);
         } catch (error) {
@@ -68,7 +74,7 @@ const startPassport = () => {
           });
           if (error) throw new BadRequestError(error.details[0].message);
 
-          const user = await UserModel.findOne({ email: username }).lean();
+          const user = await userDAO.getActiveUserByEmail(username);
           if (!user || !bcrypt.compareSync(password, user.password))
             return done(
               new UnauthorizedError("login: Email or password is incorrect")
@@ -114,17 +120,25 @@ const startPassport = () => {
           const [firstName, ...lastNameParts] = profile.displayName.split(" ");
           const lastName = lastNameParts.join(" ");
 
-          let user = await UserModel.findOne({ googleId });
+          let user = await userDAO.getActiveUserByGoogleId(googleId);
 
           // ? También podrías buscar por email para "vincular" cuentas si es el mismo usuario
           if (!user) {
-            user = await UserModel.create({
+            user = await userDAO.createUser({
               googleId,
               email,
               firstName,
               lastName,
               authProvider: "google",
             });
+
+            const cart = await cartDAO.createCart({
+              user: user._id,
+              products: [],
+            });
+
+            user.cart = cart._id;
+            await user.save();
           }
 
           return done(null, user);
