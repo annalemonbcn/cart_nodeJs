@@ -25,7 +25,7 @@ const addProductToCart = async (cartId, productId) => {
 
   await cart.save();
 
-  return cart;
+  return await getCartById(cartId);
 };
 
 const updateQuantity = async (cartId, productId, quantity) => {
@@ -41,7 +41,7 @@ const updateQuantity = async (cartId, productId, quantity) => {
   productInCart.quantity = quantity;
   await cart.save();
 
-  return cart;
+  return await getCartById(cartId);
 };
 
 const replaceProducts = async (cartId, products) => {
@@ -50,7 +50,7 @@ const replaceProducts = async (cartId, products) => {
   cart.products = products;
   await cart.save();
 
-  return cart;
+  return await getCartById(cartId);
 };
 
 const deleteProductFromCart = async (cartId, productId) => {
@@ -64,11 +64,11 @@ const deleteProductFromCart = async (cartId, productId) => {
   }
 
   cart.products = cart.products.filter(
-    ({ product }) => product.toString() !== productId
+    ({ product }) => product._id.toString() !== productId
   );
   await cart.save();
 
-  return cart;
+  return await getCartById(cartId);
 };
 
 const softDelete = async (cartId, options = {}) =>

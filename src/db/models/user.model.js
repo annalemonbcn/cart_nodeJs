@@ -50,6 +50,8 @@ const userSchema = new mongoose.Schema(
     cart: {
       type: mongoose.Schema.Types.ObjectId,
       ref: collectionNames.cartsCollection,
+      required: true,
+      unique: true
     },
     addresses: {
       type: [

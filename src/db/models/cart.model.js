@@ -48,21 +48,6 @@ cartSchema.set("toJSON", {
     delete ret._id;
     delete ret.user;
 
-    if (Array.isArray(ret.products) && ret.products.length > 0) {
-      ret.products = ret.products.map((product) => {
-        // TODO: delete when implement toJSON to product
-        if (product._id) {
-          delete product._id;
-        }
-
-        if (product.product && product.product._id) {
-          delete product.product._id;
-        }
-
-        return product;
-      });
-    }
-
     return ret;
   },
 });
