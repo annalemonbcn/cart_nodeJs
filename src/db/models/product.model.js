@@ -56,6 +56,16 @@ const productSchema = new mongoose.Schema({
   },
 });
 
+productSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (doc, ret) => {
+    delete ret._id;
+
+    return ret;
+  },
+});
+
 productSchema.plugin(mongoosePaginate);
 const ProductModel = mongoose.model(
   collectionNames.productsCollection,
