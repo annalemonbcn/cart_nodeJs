@@ -4,9 +4,41 @@ import { validCountries } from "./constants.js";
 
 const { zipCodeRegex, phoneRegex } = regex;
 
-const baseDeliveryAddressSchema = {
+const deliveryAddressSchemaValidation = Joi.object({
+  street: Joi.string().required(),
+  additionalInfo: Joi.string().optional().empty(""),
+  zipCode: Joi.string()
+    .pattern(zipCodeRegex)
+    .message("Zip code must be 3-10 characters long")
+    .required(),
+  city: Joi.string().required(),
+  province: Joi.string().required(),
+  country: Joi.string()
+    .valid(...validCountries)
+    .required()
+    .messages({
+      "any.only": "Invalid country",
+    }),
+});
+
+const addressSchemaValidation = Joi.object({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  deliveryAddress: deliveryAddressSchemaValidation.required(),
+  phoneNumber: Joi.string()
+    .pattern(phoneRegex)
+    .message("Invalid phoneNumber format")
+    .required(),
+  isDefault: Joi.boolean().optional(),
+  tags: Joi.array().items(Joi.string().max(20)).max(5).optional().messages({
+    "array.max": "You can add up to 5 tags maximum",
+    "string.max": "Each tag must be ≤ 20 characters",
+  }),
+});
+
+const editDeliveryAddressSchemaValidation = Joi.object({
   street: Joi.string(),
-  additionalInfo: Joi.string().allow("").optional(),
+  additionalInfo: Joi.string().empty(""),
   zipCode: Joi.string()
     .pattern(zipCodeRegex)
     .message("Zip code must be 3-10 characters long"),
@@ -14,28 +46,16 @@ const baseDeliveryAddressSchema = {
   province: Joi.string(),
   country: Joi.string()
     .valid(...validCountries)
+
     .messages({
       "any.only": "Invalid country",
     }),
-};
-
-const deliveryAddressSchemaValidation = Joi.object({
-  ...baseDeliveryAddressSchema,
-  street: baseDeliveryAddressSchema.street.required(),
-  zipCode: baseDeliveryAddressSchema.zipCode.required(),
-  city: baseDeliveryAddressSchema.city.required(),
-  province: baseDeliveryAddressSchema.province.required(),
-  country: baseDeliveryAddressSchema.country.required(),
 });
 
-const editDeliveryAddressSchemaValidation = Joi.object(
-  baseDeliveryAddressSchema
-);
-
-const baseAddressSchema = {
+const editAddressSchemaValidation = Joi.object({
   firstName: Joi.string(),
   lastName: Joi.string(),
-  deliveryAddress: Joi.object(baseDeliveryAddressSchema),
+  deliveryAddress: editDeliveryAddressSchemaValidation,
   phoneNumber: Joi.string()
     .pattern(phoneRegex)
     .message("Invalid phoneNumber format"),
@@ -44,16 +64,6 @@ const baseAddressSchema = {
     "array.max": "You can add up to 5 tags maximum",
     "string.max": "Each tag must be ≤ 20 characters",
   }),
-};
-
-const addressSchemaValidation = Joi.object({
-  ...baseAddressSchema,
-  firstName: baseAddressSchema.firstName.required(),
-  lastName: baseAddressSchema.lastName.required(),
-  deliveryAddress: deliveryAddressSchemaValidation.required(),
-  phoneNumber: baseAddressSchema.phoneNumber.required(),
 });
-
-const editAddressSchemaValidation = Joi.object(baseAddressSchema);
 
 export { addressSchemaValidation, editAddressSchemaValidation };
