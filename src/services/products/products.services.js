@@ -1,6 +1,10 @@
-import { NotFoundError } from "#utils/errors.js";
-import ProductModel from "../db/models/product.model.js";
-import { buildPaginationLinks } from "../helpers/index.js";
+import { productDAO } from "#dao/products/product.dao.js";
+import { BadRequestError } from "#utils/errors.js";
+import { buildPaginationLinks } from "../../helpers/index.js";
+import {
+  productSchemaValidation,
+  updateProductSchemaValidation,
+} from "./validations.js";
 
 const fetchProductsService = async (req) => {
   const { page, limit, query, sort } = req.query;
@@ -23,7 +27,6 @@ const fetchProductsService = async (req) => {
   const options = {
     page: parsedPage,
     limit: parsedLimit,
-    lean: true,
     sort: sortOption,
   };
 
@@ -35,7 +38,7 @@ const fetchProductsService = async (req) => {
     nextPage,
     hasPrevPage,
     hasNextPage,
-  } = await ProductModel.paginate(filter, options);
+  } = await productDAO.get(filter, options);
 
   const { prevLink, nextLink } = buildPaginationLinks(
     req,
@@ -63,50 +66,24 @@ const fetchProductsService = async (req) => {
   };
 };
 
-const getProductByIdService = async (pid) => {
-  const product = await ProductModel.findById(pid).lean();
-  if (!product)
-    throw new NotFoundError(
-      `getProductByIdService: Product with id ${pid} doesn't exist`
-    );
-
-  return product;
-};
-
 const createProductService = async (product) => {
-  const newProduct = await ProductModel.create(product);
-  return newProduct;
+  const { error } = productSchemaValidation.validate(product);
+  if (error) throw new BadRequestError(error.details[0].message);
+
+  return await productDAO.save(product);
 };
 
 const updateProductService = async (pid, fieldsToUpdate) => {
-  const options = { new: true, runValidators: true };
-  const updatedproduct = await ProductModel.findByIdAndUpdate(
-    pid,
-    fieldsToUpdate,
-    options
-  );
+  const { error } = updateProductSchemaValidation.validate(fieldsToUpdate);
+  if (error) throw new BadRequestError(error.details[0].message);
 
-  if (!updatedproduct)
-    throw new NotFoundError(
-      `updateProductService: Product with id ${pid} doesn't exist`
-    );
-
-  return updatedproduct;
+  return await productDAO.update(pid, fieldsToUpdate);
 };
 
-const deleteProductService = async (pid) => {
-  const deletedProduct = await ProductModel.findByIdAndDelete(pid);
-  if (!deletedProduct)
-    throw new NotFoundError(
-      `deleteProductService:Product with id ${pid} doesn't exist`
-    );
-
-  return deletedProduct;
-};
+const deleteProductService = async (pid) => await productDAO.delete(pid);
 
 const productServices = {
   fetchProductsService,
-  getProductByIdService,
   createProductService,
   updateProductService,
   deleteProductService,

@@ -1,9 +1,8 @@
-import { productServices } from "#services/products.services.js";
+import { productServices } from "#services/products/products.services.js";
 import { BadRequestError } from "#utils/errors.js";
 
 const {
   fetchProductsService,
-  getProductByIdService,
   createProductService,
   updateProductService,
   deleteProductService,
@@ -15,29 +14,23 @@ const getAllProducts = async (req, res) => {
   return res.status(200).json({
     status: "success",
     code: 200,
+    message: "Products retrieved successfully",
     payload: docs,
     pageContext,
   });
 };
 
-const getProductById = async (req, res) => {
-  const { pid } = req.params;
-  if (!pid)
-    throw new BadRequestError(
-      "getProductById: Missing product id in request params"
-    );
-
-  const product = await getProductByIdService(pid);
-
-  return res
-    .status(200)
-    .json({ status: "success", code: 200, payload: product });
-};
+const getProductById = async (req, res) =>
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Product retrieved successfully",
+    payload: req.product,
+  });
 
 const createProduct = async (req, res) => {
   const product = req.body;
-  if (!product || Object.keys(product).length === 0)
-    throw new BadRequestError("createProduct: Missing product in request body");
+  if (!product) throw new BadRequestError("Missing product in request body");
 
   const newProduct = await createProductService(product);
 
@@ -50,15 +43,17 @@ const createProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { pid } = req.params;
   const fieldsToUpdate = req.body;
 
-  if (!pid || Object.keys(fieldsToUpdate).length === 0)
+  if (Object.keys(fieldsToUpdate).length === 0)
     throw new BadRequestError(
-      "updateProduct: Missing product id or fieldsToUpdate property in request"
+      "updateProduct: Missing fieldsToUpdate property in request"
     );
 
-  const updated = await updateProductService(pid, fieldsToUpdate);
+  const updated = await updateProductService(
+    req.product._id.toString(),
+    fieldsToUpdate
+  );
 
   return res.status(200).json({
     status: "success",
@@ -69,13 +64,7 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const { pid } = req.params;
-  if (!pid)
-    throw new BadRequestError(
-      "deleteProduct: Missing product id in request params"
-    );
-
-  const deleted = await deleteProductService(pid);
+  const deleted = await deleteProductService(req.product._id.toString());
 
   return res.status(200).json({
     status: "success",

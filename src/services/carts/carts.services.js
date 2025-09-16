@@ -1,36 +1,38 @@
 import { cartDAO } from "#dao/cart/cart.dao.js";
-import { NotFoundError } from "../utils/errors.js";
+import { productDAO } from "#dao/products/product.dao.js";
+import { validateStock } from "./validations.js";
 
 const createCartService = async (cartData) =>
   await cartDAO.createCart(cartData);
 
 const addProductToCartService = async (cid, pid) => {
-  const updatedCart = await cartDAO.addProductToCart(cid, pid);
-  if (!updatedCart)
-    throw new NotFoundError(`Cart with id ${cid} doesn't exist`);
+  const product = await productDAO.getProductById(pid);
+  validateStock(1, product.stock);
 
+  const updatedCart = await cartDAO.addProductToCart(cid, pid);
   return updatedCart;
 };
 
 const updateQuantityService = async (cid, pid, newQuantity) => {
-  const cart = await cartDAO.updateQuantity(cid, pid, newQuantity);
-  if (!cart) throw new NotFoundError(`Cart with id ${cid} doesn't exist`);
+  const product = await productDAO.getProductById(pid);
+  validateStock(newQuantity, product.stock);
 
+  const cart = await cartDAO.updateQuantity(cid, pid, newQuantity);
   return cart;
 };
 
 const replaceProductsService = async (cid, products) => {
-  const updatedCart = await cartDAO.replaceProducts(cid, products);
-  if (!updatedCart)
-    throw new NotFoundError(`Cart with id ${cid} doesn't exist`);
+  for (const product of products) {
+    const productData = await productDAO.getProductById(product.product);
+    validateStock(product.quantity, productData.stock);
+  }
 
+  const updatedCart = await cartDAO.replaceProducts(cid, products);
   return updatedCart;
 };
 
 const deleteProductFromCartService = async (cid, pid) => {
   const cart = await cartDAO.deleteProductFromCart(cid, pid);
-  if (!cart) throw new NotFoundError(`Cart with id ${cid} doesn't exist`);
-
   return cart;
 };
 

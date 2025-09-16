@@ -1,5 +1,4 @@
-import { cartServices } from "#services/carts.services.js";
-import { BadRequestError } from "#utils/errors.js";
+import { cartServices } from "#services/carts/carts.services.js";
 import { validateProducts, validateQuantity } from "./validations.js";
 
 const {
@@ -74,7 +73,10 @@ const replaceProducts = async (req, res) => {
 
   await validateProducts(products);
 
-  const updatedCart = await replaceProductsService(req.cart._id.toString(), products);
+  const updatedCart = await replaceProductsService(
+    req.cart._id.toString(),
+    products
+  );
 
   return res.status(200).json({
     status: "success",

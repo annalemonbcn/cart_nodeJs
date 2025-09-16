@@ -1,3 +1,4 @@
+import { flatten } from "#dao/utils.js";
 import AddressModel from "#models/address.model.js";
 
 const getAddressById = async (addressId, session) =>
@@ -9,29 +10,12 @@ const getDefaultAddressByUser = async (userId) =>
 const createAddress = async (address) => await AddressModel.create(address);
 
 const updateAddress = async (addressId, fieldsToUpdate) => {
-  const setFields = {};
-
-  for (const key in fieldsToUpdate) {
-    if (
-      typeof fieldsToUpdate[key] === "object" &&
-      fieldsToUpdate[key] !== null &&
-      !Array.isArray(fieldsToUpdate[key])
-    ) {
-      for (const subKey in fieldsToUpdate[key]) {
-        setFields[`${key}.${subKey}`] = fieldsToUpdate[key][subKey];
-      }
-    } else {
-      setFields[key] = fieldsToUpdate[key];
-    }
-  }
+  const setFields = flatten(fieldsToUpdate);
 
   return await AddressModel.findByIdAndUpdate(
     addressId,
     { $set: setFields },
-    {
-      new: true,
-      runValidators: true,
-    }
+    { new: true, runValidators: true }
   );
 };
 

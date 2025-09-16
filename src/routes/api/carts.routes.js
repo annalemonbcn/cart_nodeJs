@@ -9,33 +9,28 @@ import {
 } from "#controllers/carts/carts.controller.js";
 import { authenticateAndAuthorize } from "#middlewares/auth/index.js";
 import { ForbiddenError } from "#utils/errors.js";
-import { validateAndFetchObject } from "#utils/validators.js";
 import { canAccessCart } from "./utils.js";
 import { collectionNames } from "../../db/constants/index.js";
+import { validateParam } from "#middlewares/validateParam/index.js";
 
 const router = Router();
 
 router.use(authenticateAndAuthorize());
 
-router.param("cid", async (req, res, next, cid) => {
-  const cart = await validateAndFetchObject(
-    cid,
-    collectionNames.cartsCollection
-  );
+router.param(
+  "cid",
+  validateParam("cid", collectionNames.cartsCollection, "cart")
+);
 
-  if (!canAccessCart(req.user, cart.user)) return next(new ForbiddenError());
+router.param(
+  "pid",
+  validateParam("pid", collectionNames.productsCollection, "product")
+);
 
-  req.cart = cart;
-  next();
-});
-
-router.param("pid", async (req, res, next, pid) => {
-  const product = await validateAndFetchObject(
-    pid,
-    collectionNames.productsCollection
-  );
-
-  req.product = product;
+router.param("cid", async (req, res, next) => {
+  if (!canAccessCart(req.user, req.cart.user)) {
+    return next(new ForbiddenError());
+  }
   next();
 });
 
