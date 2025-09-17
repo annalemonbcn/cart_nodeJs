@@ -62,6 +62,7 @@ const fetchProductsService = async (req) => {
       hasNextPage,
       prevLink,
       nextLink,
+      totalDocs: docs.length,
     },
   };
 };

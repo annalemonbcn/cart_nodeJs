@@ -17,9 +17,7 @@ router.param(
   validateParam("pid", collectionNames.productsCollection, "product")
 );
 
-// TODO:
-// - update swagger
-router.get("/", getAllProducts); // TODO: only gets 10 results per page ?
+router.get("/", getAllProducts);
 router.get("/:pid", getProductById);
 router.post("/", authenticateAndAuthorize("admin"), createProduct);
 router.put("/:pid", authenticateAndAuthorize("admin"), updateProduct);
