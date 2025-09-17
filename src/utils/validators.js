@@ -18,7 +18,7 @@ const validateObjectExistsInCollection = async (objId, collectionName) => {
   const object = await daoMethod(objId);
   if (!object) {
     throw new NotFoundError(
-      `Object with ID ${objId} in ${collectionName} not found`
+      `Object with ID ${objId} in ${collectionName} collection not found`
     );
   }
 

@@ -11,7 +11,7 @@ const {
 } = addressServices;
 
 const createAddress = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const addressData = req.body;
 
   if (!addressData || Object.keys(addressData).length === 0)
@@ -30,7 +30,7 @@ const createAddress = async (req, res) => {
 };
 
 const getAddressById = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const { addressId } = req.params;
 
   if (!addressId)
@@ -48,7 +48,7 @@ const getAddressById = async (req, res) => {
 const updateAddress = async (req, res) => {
   const { addressId } = req.params;
   const fieldsToUpdate = req.body;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   if (!addressId || Object.keys(fieldsToUpdate).length === 0)
     throw new BadRequestError(
@@ -79,7 +79,7 @@ const updateAddress = async (req, res) => {
 const updateDefaultStatus = async (req, res) => {
   const { addressId } = req.params;
   const { isDefault } = req.body;
-  const userId = req.user._id;
+  const userId = req.user.id;
 
   if (!addressId)
     throw new BadRequestError("updateDefaultStatus: Missing address id");
@@ -102,7 +102,7 @@ const updateDefaultStatus = async (req, res) => {
 };
 
 const deleteAddress = async (req, res) => {
-  const userId = req.user._id;
+  const userId = req.user.id;
   const { addressId } = req.params;
 
   if (!addressId)

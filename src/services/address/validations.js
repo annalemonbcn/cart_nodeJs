@@ -37,32 +37,30 @@ const addressSchemaValidation = Joi.object({
 });
 
 const editDeliveryAddressSchemaValidation = Joi.object({
-  street: Joi.string().optional(),
-  additionalInfo: Joi.string().optional().empty(""),
+  street: Joi.string(),
+  additionalInfo: Joi.string().empty(""),
   zipCode: Joi.string()
     .pattern(zipCodeRegex)
-    .message("Zip code must be 3-10 characters long")
-    .optional(),
-  city: Joi.string().optional(),
-  province: Joi.string().optional(),
+    .message("Zip code must be 3-10 characters long"),
+  city: Joi.string(),
+  province: Joi.string(),
   country: Joi.string()
     .valid(...validCountries)
-    .optional()
+
     .messages({
       "any.only": "Invalid country",
     }),
 });
 
 const editAddressSchemaValidation = Joi.object({
-  firstName: Joi.string().optional(),
-  lastName: Joi.string().optional(),
-  deliveryAddress: editDeliveryAddressSchemaValidation.optional(),
+  firstName: Joi.string(),
+  lastName: Joi.string(),
+  deliveryAddress: editDeliveryAddressSchemaValidation,
   phoneNumber: Joi.string()
     .pattern(phoneRegex)
-    .message("Invalid phoneNumber format")
-    .optional(),
-  isDefault: Joi.boolean().optional(),
-  tags: Joi.array().items(Joi.string().max(20)).max(5).optional().messages({
+    .message("Invalid phoneNumber format"),
+  isDefault: Joi.boolean(),
+  tags: Joi.array().items(Joi.string().max(20)).max(5).messages({
     "array.max": "You can add up to 5 tags maximum",
     "string.max": "Each tag must be ≤ 20 characters",
   }),

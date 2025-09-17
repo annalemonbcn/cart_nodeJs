@@ -16,7 +16,8 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/app.js",
-    "dev": "cross-env NODE_ENV=development nodemon ./src/app.js"
+    "dev": "cross-env NODE_ENV=development nodemon ./src/app.js",
+    "seedProducts": "NODE_ENV=development node ./src/db/seeders/products.js"
   },
   "keywords": [],
   "author": "",

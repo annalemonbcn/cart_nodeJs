@@ -19,50 +19,39 @@ paths:
         - Products
       summary: Get all products
       description: Returns a paginated list of products
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number (starts at 1)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Number of products per page
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: Search term to filter products (e.g. by title, brand, etc.)
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+          description: Sort order by price or other criteria
       responses:
         "200":
-          description: A list of products
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  code:
-                    type: integer
-                    example: 200
-                  payload:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Product"
-                  pageContext:
-                    type: object
-                    description: Pagination context
-                    properties:
-                      page:
-                        type: integer
-                      totalPages:
-                        type: integer
-                      totalDocs:
-                        type: integer
+          $ref: "#/components/responses/AllProductsFound"
         "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  code:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: Internal server error
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       tags:
@@ -80,6 +69,10 @@ paths:
           $ref: "#/components/responses/ProductCreated"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -129,6 +122,10 @@ paths:
           $ref: "#/components/responses/ProductUpdated"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -151,6 +148,10 @@ paths:
           $ref: "#/components/responses/ProductDeleted"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -595,36 +596,97 @@ components:
 
   schemas:
     # 📦 Base models (pure data)
+    ProductFeatures:
+      type: object
+      required: [fabric, pattern, fit, neck, sleeve, style]
+      properties:
+        fabric:
+          type: string
+          enum: [cotton, polyester, wool, linen, denim, leather]
+          required: true
+        pattern:
+          type: string
+          enum: [solid, striped, printed, floral]
+          required: true
+        fit:
+          type: string
+          enum: [regular, slim, loose]
+          required: true
+        neck:
+          type: string
+          enum: [round, v-neck]
+          required: true
+        sleeve:
+          type: string
+          enum: [short, long]
+          required: true
+        style:
+          type: string
+          enum: [classic, casual, business, sport, elegant, formal]
+          required: true
+
     Product:
       type: object
       required:
-        [title, description, code, price, status, stock, category, thumbnails]
+        [
+          code,
+          title,
+          description,
+          brand,
+          features,
+          sizes,
+          colours,
+          price,
+          status,
+          stock,
+          categories,
+          thumbnails,
+        ]
       properties:
+        code:
+          type: string
         title:
           type: string
         description:
           type: string
-        code:
+        brand:
           type: string
-        price:
-          type: number
-        status:
-          type: string
-          enum: [in_stock, out_of_stock]
-          default: in_stock
-        stock:
-          type: integer
-        category:
-          type: string
-          enum:
-            [electronics, fashion, home, sports, beauty, games, books, music]
-        thumbnails:
+          enum: [naikis, adwidas, poma, rwebook]
+          required: true
+        features:
+          $ref: "#/components/schemas/ProductFeatures"
+        sizes:
+          type: array
+          items:
+            type: string
+            enum: [XS, S, M, L, XL]
+        colours:
           type: array
           items:
             type: object
             properties:
-              url:
+              name:
                 type: string
+                enum: [black, yellow, pink, red]
+              available:
+                type: boolean
+        price:
+          type: number
+          example: 39.99
+        stock:
+          type: integer
+          example: 10
+        categories:
+          type: array
+          items:
+            type: string
+            enum:
+              [electronics, fashion, home, sports, beauty, games, books, music]
+        thumbnails:
+          type: array
+          items:
+            type: string
+            example: "https://example.com/image.jpg"
 
     CartProduct:
       type: object
@@ -843,9 +905,9 @@ components:
       allOf:
         - $ref: "#/components/schemas/Product"
         - type: object
-          required: [_id]
+          required: [id]
           properties:
-            _id:
+            id:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
               description: ObjectId of the product
@@ -950,6 +1012,42 @@ components:
           type: string
           example: Operation successful
 
+    PageContextResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+      type: object
+      properties:
+        pageContext:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            totalPages:
+              type: integer
+              example: 1
+            prevPage:
+              type: integer
+              example: 1
+            nextPage:
+              type: integer
+              example: 1
+            hasPrevPage:
+              type: boolean
+              example: true
+            hasNextPage:
+              type: boolean
+              example: true
+            prevLink:
+              type: string
+              example: null
+            nextLink:
+              type: string
+              example: "http://localhost:3000/api/products?page=2"
+            totalDocs:
+              type: integer
+              example: 1
+
     DeleteResponse:
       $ref: "#/components/schemas/BaseResponse"
 
@@ -966,6 +1064,17 @@ components:
         message:
           type: string
           example: Something went wrong
+
+    AllProductsResponse:
+      allOf:
+        - $ref: "#/components/schemas/PageContextResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductOutput"
 
     ProductResponse:
       allOf:
@@ -1135,6 +1244,13 @@ components:
                 message: Email already in use
 
     # - Product responses
+    AllProductsFound:
+      description: All products found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AllProductsResponse"
+
     ProductCreated:
       description: Product successfully created
       content:

@@ -1,6 +1,15 @@
 import passport from "passport";
 import { ForbiddenError, UnauthorizedError } from "#utils/errors.js";
 
+const validateRoles = (allowedRoles, userRole) => {
+  const shouldValidateAllowedRoles = !!allowedRoles.length;
+  if (!shouldValidateAllowedRoles) return;
+
+  const isUserRoleInAllowedRoles = allowedRoles.includes(userRole);
+  if (!isUserRoleInAllowedRoles)
+    throw new ForbiddenError("Forbidden: Insufficient permissions");
+};
+
 const authenticateAndAuthorize =
   (...allowedRoles) =>
   (req, res, next) => {
@@ -9,9 +18,7 @@ const authenticateAndAuthorize =
 
       req.user = user;
 
-      if (allowedRoles.length && !allowedRoles.includes(user.role)) {
-        return next(new ForbiddenError("Forbidden: Insufficient permissions"));
-      }
+      validateRoles(allowedRoles, user.role);
 
       next();
     })(req, res, next);
