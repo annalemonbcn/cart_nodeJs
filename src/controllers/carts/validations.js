@@ -14,7 +14,7 @@ const validateQuantity = (quantity) => {
 
 const validateProducts = async (products) => {
   if (!Array.isArray(products) || products.length === 0)
-    new BadRequestError("Missing products in request");
+    throw new BadRequestError("Missing products in request");
 
   await Promise.all(
     products.map(async (product) => {

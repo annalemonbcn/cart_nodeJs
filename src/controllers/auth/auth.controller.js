@@ -50,6 +50,7 @@ const loginUser = async (req, res, next) => {
       id: user._id,
       email: user.email,
       role: user.role,
+      isActive: !user.deletedAt,
     });
 
     return res.status(200).json({
@@ -70,6 +71,7 @@ const googleCallback = (req, res) => {
     id: req.user._id,
     email: req.user.email,
     role: req.user.role,
+    isActive: !req.user.deletedAt,
   });
   res.redirect(`${FRONT_URL}/auth/success?token=${token}`);
 };

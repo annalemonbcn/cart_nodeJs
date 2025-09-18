@@ -3,7 +3,6 @@ import { addressDAO } from "#dao/address/address.dao.js";
 import { userDAO } from "#dao/user/user.dao.js";
 import {
   validateUserHasLessThanFiveAddresses,
-  validateAddressBelongsToUser,
   validateIsUniqueDefaultAddress,
 } from "./utils.js";
 import {
@@ -11,15 +10,6 @@ import {
   editAddressSchemaValidation,
 } from "./validations.js";
 import { withTransaction } from "#utils/transactions.js";
-
-const getAddressByIdService = async (addressId, userId) => {
-  const address = await addressDAO.getAddressById(addressId);
-  if (!address) throw new NotFoundError("Address not found");
-
-  validateAddressBelongsToUser(address, userId);
-
-  return address;
-};
 
 const createAddressService = async (userId, addressData) => {
   const { error } = addressSchemaValidation.validate(addressData);
@@ -47,10 +37,7 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
   const address = await addressDAO.getAddressById(addressId);
   if (!address) throw new NotFoundError("updateAddress: Address not found");
 
-  validateAddressBelongsToUser(address, userId);
-
   const user = await userDAO.getActiveUserById(userId);
-  if (!user) throw new NotFoundError("User not found");
 
   validateIsUniqueDefaultAddress(
     fieldsToUpdate.isDefault,
@@ -69,7 +56,6 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
 const updateDefaultStatusService = async (userId, addressId, isDefault) => {
   const address = await addressDAO.getAddressById(addressId);
   if (!address) throw new NotFoundError("Address not found");
-  validateAddressBelongsToUser(address, userId);
 
   if (isDefault) {
     await addressDAO.unsetDefaultForUser(userId);
@@ -80,18 +66,12 @@ const updateDefaultStatusService = async (userId, addressId, isDefault) => {
 
 const deleteAddressService = async (userId, addressId) =>
   withTransaction(async (session) => {
-    const address = await addressDAO.getAddressById(addressId, session);
-    if (!address) throw new NotFoundError("deleteAddress: Address not found");
-
-    validateAddressBelongsToUser(address, userId);
-
     await userDAO.removeAddressFromUser(userId, addressId, session);
 
-    await addressDAO.deleteAddress(addressId, session);
+    await addressDAO.softDelete(addressId, session);
   });
 
 const addressServices = {
-  getAddressByIdService,
   createAddressService,
   updateAddressService,
   updateDefaultStatusService,

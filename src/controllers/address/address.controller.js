@@ -1,10 +1,8 @@
 import { addressServices } from "#services/address/address.services.js";
 import { BadRequestError } from "#utils/errors.js";
-import { isValidAddressId } from "#services/address/utils.js";
 
 const {
   createAddressService,
-  getAddressByIdService,
   updateAddressService,
   updateDefaultStatusService,
   deleteAddressService,
@@ -29,38 +27,24 @@ const createAddress = async (req, res) => {
   });
 };
 
-const getAddressById = async (req, res) => {
-  const userId = req.user.id;
-  const { addressId } = req.params;
-
-  if (!addressId)
-    throw new BadRequestError("getAddressById: Missing address id");
-
-  isValidAddressId(addressId);
-
-  const address = await getAddressByIdService(addressId, userId);
-
-  return res
-    .status(200)
-    .json({ status: "success", code: 200, payload: address });
-};
+const getAddressById = async (req, res) =>
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Address retrieved successfully",
+    payload: req.address,
+  });
 
 const updateAddress = async (req, res) => {
-  const { addressId } = req.params;
-  const fieldsToUpdate = req.body;
+  const addressId = req.address._id.toString();
   const userId = req.user.id;
+  const fieldsToUpdate = req.body;
 
-  if (!addressId || Object.keys(fieldsToUpdate).length === 0)
-    throw new BadRequestError(
-      "updateAddress: Missing address id or fieldsToUpdate property in request"
-    );
-
-  isValidAddressId(addressId);
+  if (Object.keys(fieldsToUpdate).length === 0)
+    throw new BadRequestError(" Missing fieldsToUpdate property in request");
 
   if ("user" in req.body)
-    throw new BadRequestError(
-      "updateAddress: property 'user' cannot be modified"
-    );
+    throw new BadRequestError("property 'user' cannot be modified");
 
   const updatedAddress = await updateAddressService(
     userId,
@@ -77,15 +61,12 @@ const updateAddress = async (req, res) => {
 };
 
 const updateDefaultStatus = async (req, res) => {
-  const { addressId } = req.params;
-  const { isDefault } = req.body;
+  const addressId = req.address._id.toString();
   const userId = req.user.id;
-
-  if (!addressId)
-    throw new BadRequestError("updateDefaultStatus: Missing address id");
+  const { isDefault } = req.body;
 
   if (typeof isDefault !== "boolean")
-    throw new BadRequestError("updateDefaultStatus: isDefault must be boolean");
+    throw new BadRequestError("isDefault must be boolean");
 
   const updatedAddress = await updateDefaultStatusService(
     userId,
@@ -102,13 +83,8 @@ const updateDefaultStatus = async (req, res) => {
 };
 
 const deleteAddress = async (req, res) => {
+  const addressId = req.address._id.toString();
   const userId = req.user.id;
-  const { addressId } = req.params;
-
-  if (!addressId)
-    throw new BadRequestError("deleteAddress: Missing address id");
-
-  isValidAddressId(addressId);
 
   await deleteAddressService(userId, addressId);
 

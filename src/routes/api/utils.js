@@ -1,8 +1,11 @@
-const canAccessCart = (reqUser, cartUser) => {
-  if (reqUser.role === "admin" || reqUser.id.toString() === cartUser.toString())
+const canAccessCollection = (reqUser, collectionUser) => {
+  if (
+    reqUser.role === "admin" ||
+    reqUser.id.toString() === collectionUser.toString()
+  )
     return true;
 
   return false;
 };
 
-export { canAccessCart };
+export { canAccessCollection };
