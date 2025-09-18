@@ -1,15 +1,8 @@
-import { BadRequestError, UnauthorizedError } from "#utils/errors.js";
-import mongoose from "mongoose";
+import { BadRequestError } from "#utils/errors.js";
 
 const validateUserHasLessThanFiveAddresses = (userAddresses) => {
   if (userAddresses.length >= 5) {
     throw new BadRequestError("User cannot have more than 5 addresses");
-  }
-};
-
-const validateAddressBelongsToUser = (address, userId) => {
-  if (address.user.toString() !== userId.toString()) {
-    throw new UnauthorizedError("Address does not belong to user");
   }
 };
 
@@ -29,17 +22,4 @@ const validateIsUniqueDefaultAddress = (
   }
 };
 
-const isValidAddressId = (addressId) => {
-  if (!mongoose.Types.ObjectId.isValid(addressId)) {
-    throw new BadRequestError("Invalid address id");
-  }
-
-  return true;
-};
-
-export {
-  validateUserHasLessThanFiveAddresses,
-  validateAddressBelongsToUser,
-  validateIsUniqueDefaultAddress,
-  isValidAddressId,
-};
+export { validateUserHasLessThanFiveAddresses, validateIsUniqueDefaultAddress };

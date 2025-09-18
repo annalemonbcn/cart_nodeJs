@@ -14,7 +14,8 @@ const authenticateAndAuthorize =
   (...allowedRoles) =>
   (req, res, next) => {
     passport.authenticate("jwt-verify", { session: false }, (err, user) => {
-      if (err || !user) return next(new UnauthorizedError("Unauthorized"));
+      if (err || !user || !user.isActive)
+        return next(new UnauthorizedError("Unauthorized"));
 
       req.user = user;
 

@@ -9,7 +9,7 @@ import {
 } from "#controllers/carts/carts.controller.js";
 import { authenticateAndAuthorize } from "#middlewares/auth/index.js";
 import { ForbiddenError } from "#utils/errors.js";
-import { canAccessCart } from "./utils.js";
+import { canAccessCollection } from "./utils.js";
 import { collectionNames } from "../../db/constants/index.js";
 import { validateParam } from "#middlewares/validateParam/index.js";
 
@@ -28,7 +28,7 @@ router.param(
 );
 
 router.param("cid", async (req, res, next) => {
-  if (!canAccessCart(req.user, req.cart.user)) {
+  if (!canAccessCollection(req.user, req.cart.user)) {
     return next(new ForbiddenError());
   }
   next();
