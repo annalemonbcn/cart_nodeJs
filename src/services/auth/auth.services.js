@@ -1,19 +1,14 @@
 import "dotenv-flow/config";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import passport from "passport";
 import { userDAO } from "#dao/user/user.dao.js";
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from "#utils/errors.js";
+import { BadRequestError, NotFoundError } from "#utils/errors.js";
 import {
   emailSchemaValidation,
   passwordSchemaValidation,
 } from "./validations.js";
-import { generateToken } from "#controllers/auth/utils.js";
+import { decodeToken, generateToken } from "#controllers/auth/utils.js";
+import { encryptPassword } from "#utils/bcrypt.js";
 
 const registerUserService = (req) => {
   return new Promise((resolve) => {
@@ -76,16 +71,12 @@ const resetPasswordService = async (token, password) => {
   const { error } = passwordSchemaValidation.validate({ password });
   if (error) throw new BadRequestError(error.details[0].message);
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  console.log('decoded', decoded)
+  const decoded = decodeToken(token);
 
   const activeUser = await userDAO.getActiveUserByEmail(decoded.email);
   if (!activeUser) throw new NotFoundError("User not found");
 
-  const hashedPassword = bcrypt.hashSync(
-    password,
-    Number(process.env.BCRYPT_SALT)
-  );
+  const hashedPassword = encryptPassword(password);
 
   await userDAO.updatePassword(activeUser._id, hashedPassword);
 };
@@ -98,4 +89,3 @@ const authServices = {
 };
 
 export { authServices };
-// new pass: 123Anna!

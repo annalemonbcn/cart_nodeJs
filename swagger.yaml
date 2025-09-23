@@ -458,6 +458,32 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/user/change-password:
+    patch:
+      summary: Change user password
+      description: Changes the authenticated user's password
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordInput"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserPasswordChange"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/user/soft:
     delete:
       summary: Soft delete user profile
@@ -924,6 +950,15 @@ components:
           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
           format: jwt
           description: JWT token
+        password:
+          type: string
+          format: password
+          example: "StrongPass123!"
+
+    ChangePasswordInput:
+      type: object
+      required: [password]
+      properties:
         password:
           type: string
           format: password
@@ -1462,6 +1497,23 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UserResponse"
+
+    UserPasswordChange:
+      description: User password successfully changed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: success
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: Password successfully reset
 
     UserProfileDeleted:
       description: User profile successfully deleted
