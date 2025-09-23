@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import { collectionNames } from "../constants/index.js";
+import bcrypt from "bcrypt";
+import "dotenv-flow/config";
+
+const bcryptSalt = process.env.BCRYPT_SALT;
 
 const arrayLimit = (val) => val.length <= 5;
 
@@ -90,6 +94,17 @@ userSchema.set("toJSON", {
 
     return ret;
   },
+});
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password")) return next();
+  bcrypt
+    .hash(this.password, Number(bcryptSalt))
+    .then((hash) => {
+      this.password = hash;
+      next();
+    })
+    .catch(next);
 });
 
 const UserModel = mongoose.model(collectionNames.usersCollection, userSchema);

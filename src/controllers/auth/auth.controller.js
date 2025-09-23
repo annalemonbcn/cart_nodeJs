@@ -1,8 +1,14 @@
+import "dotenv-flow/config";
 import { authServices } from "#services/auth/auth.services.js";
 import { generateToken } from "./utils.js";
 import { BadRequestError } from "#utils/errors.js";
 
-const { registerUserService, loginUserService, forgotPasswordService } = authServices;
+const {
+  registerUserService,
+  loginUserService,
+  forgotPasswordService,
+  resetPasswordService,
+} = authServices;
 
 const sanitizeUser = (user) => {
   const toJSON = user.toJSON();
@@ -66,15 +72,33 @@ const loginUser = async (req, res, next) => {
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  if(!email) throw new BadRequestError("Missing email in request");
+  if (!email) throw new BadRequestError("Missing email in request");
 
+  const previewURL = await forgotPasswordService(email);
 
-
-  forgotPasswordService(email)
-
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Password reset email sent successfully",
+    payload: { previewURL },
+  });
 };
 
-const FRONT_URL = "http://localhost:5173";
+const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password)
+    throw new BadRequestError("Missing token or password in request");
+
+  await resetPasswordService(token, password);
+
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Password reset successfully",
+  });
+};
+
+const FRONT_URL = process.env.FRONTEND_URL;
 
 const googleCallback = (req, res) => {
   const token = generateToken({
@@ -86,4 +110,10 @@ const googleCallback = (req, res) => {
   res.redirect(`${FRONT_URL}/auth/success?token=${token}`);
 };
 
-export { registerUser, loginUser, forgotPassword, googleCallback };
+export {
+  registerUser,
+  loginUser,
+  forgotPassword,
+  resetPassword,
+  googleCallback,
+};

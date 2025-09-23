@@ -38,16 +38,15 @@ const updateProfile = async (req, res) => {
   });
 };
 
-// TODO: to be tested
 const changePassword = async (req, res) => {
   const { password: newPassword } = req.body;
+  if (!newPassword) throw new BadRequestError("Missing password");
 
-  const updatedProfile = await updatePasswordService(req.user.id, newPassword);
+  await updatePasswordService(req.user.id, newPassword);
 
   res.status(200).json({
     status: "success",
     code: 200,
-    payload: updatedProfile,
     message: "User password updated successfully",
   });
 };

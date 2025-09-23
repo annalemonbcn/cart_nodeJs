@@ -12,6 +12,7 @@ import {
 } from "./validations.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
 import { withTransaction } from "#utils/transactions.js";
+import { encryptPassword } from "#utils/bcrypt.js";
 
 const SECRET = process.env.JWT_SECRET;
 
@@ -44,7 +45,7 @@ const startPassport = () => {
                 firstName,
                 lastName,
                 email: username,
-                password: bcrypt.hashSync(password, 10),
+                password: encryptPassword(password),
               },
               { session }
             );

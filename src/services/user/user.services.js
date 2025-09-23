@@ -3,7 +3,11 @@ import { userDAO } from "#dao/user/user.dao.js";
 import { cartDAO } from "#dao/cart/cart.dao.js";
 import { AppError, BadRequestError, NotFoundError } from "#utils/errors.js";
 import { withTransaction } from "#utils/transactions.js";
-import { updateUserProfileSchemaValidation } from "./validations.js";
+import {
+  updatePasswordSchemaValidation,
+  updateUserProfileSchemaValidation,
+} from "./validations.js";
+import { encryptPassword } from "#utils/bcrypt.js";
 
 const getUserProfileByIdService = async (userId) => {
   const userProfile = await userDAO.getActiveUserById(userId);
@@ -33,8 +37,10 @@ const updatePasswordService = async (userId, newPassword) => {
   });
   if (error) throw new BadRequestError(error.details[0].message);
 
-  return await userDAO.updatePassword(userId, newPassword);
-}
+  const hashedPassword = encryptPassword(newPassword);
+
+  return await userDAO.updatePassword(userId, hashedPassword);
+};
 
 const softDeleteProfileByIdService = async (userId) =>
   withTransaction(async (session) => {
