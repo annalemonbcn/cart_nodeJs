@@ -35,12 +35,8 @@ const updateUser = async (userId, fieldsToUpdate, options = {}) =>
     ...options,
   });
 
-const updatePassword = async (userId, newPassword) =>
-  await UserModel.findByIdAndUpdate(
-    userId,
-    { password: bcrypt.hash(newPassword, 10) },
-    { new: true }
-  );
+const updatePassword = async (userId, password) =>
+  await UserModel.findByIdAndUpdate(userId, { password }, { new: true });
 
 const addAddressToUser = async (userId, addressId) => {
   await UserModel.findByIdAndUpdate(userId, {
