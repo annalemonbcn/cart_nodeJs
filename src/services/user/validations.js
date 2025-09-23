@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { regex } from "#utils/regex.js";
 
-const { emailRegex, phoneRegex } = regex;
+const { emailRegex, phoneRegex, passwordRegex } = regex;
 
 const updateUserProfileSchemaValidation = Joi.object({
   firstName: Joi.string().optional(),
@@ -16,4 +16,11 @@ const updateUserProfileSchemaValidation = Joi.object({
     .optional(),
 });
 
-export { updateUserProfileSchemaValidation };
+const updatePasswordSchemaValidation = Joi.object({
+  password: Joi.string()
+    .pattern(passwordRegex)
+    .message("Invalid password format")
+    .required(),
+});
+
+export { updateUserProfileSchemaValidation, updatePasswordSchemaValidation };

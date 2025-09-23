@@ -1,4 +1,5 @@
 import UserModel from "#models/user.model.js";
+import bcrypt from "bcrypt";
 
 const createUser = async (user, options = {}) => {
   const users = await UserModel.create([user], options);
@@ -19,6 +20,8 @@ const getActiveUserById = async (userId) =>
     )
     .populate("addresses");
 
+const getUserByEmail = async (email) => await UserModel.findOne({ email });
+
 const getActiveUserByEmail = async (email) =>
   await UserModel.findOne({ email, deletedAt: null });
 
@@ -31,6 +34,13 @@ const updateUser = async (userId, fieldsToUpdate, options = {}) =>
     runValidators: true,
     ...options,
   });
+
+const updatePassword = async (userId, newPassword) =>
+  await UserModel.findByIdAndUpdate(
+    userId,
+    { password: bcrypt.hash(newPassword, 10) },
+    { new: true }
+  );
 
 const addAddressToUser = async (userId, addressId) => {
   await UserModel.findByIdAndUpdate(userId, {
@@ -61,10 +71,12 @@ const hardDelete = async (userId, options = {}) =>
 const userDAO = {
   createUser,
   getUserById,
+  getUserByEmail,
   getActiveUserById,
   getActiveUserByEmail,
   getActiveUserByGoogleId,
   updateUser,
+  updatePassword,
   addAddressToUser,
   removeAddressFromUser,
   isEmailUnique,

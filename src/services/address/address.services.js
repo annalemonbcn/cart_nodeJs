@@ -41,8 +41,8 @@ const updateAddressService = async (userId, addressId, fieldsToUpdate) => {
 
   validateIsUniqueDefaultAddress(
     fieldsToUpdate.isDefault,
-    addressId,
-    user.addresses
+    user.addresses,
+    addressId
   );
 
   const updatedAddress = await addressDAO.updateAddress(

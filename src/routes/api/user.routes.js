@@ -3,6 +3,7 @@ import { authenticateAndAuthorize } from "#middlewares/auth/index.js";
 import {
   getCurrentUserProfile,
   updateProfile,
+  changePassword,
   softDeleteProfile,
   deleteProfile,
 } from "#controllers/user/user.controller.js";
@@ -13,7 +14,12 @@ router.use(authenticateAndAuthorize());
 
 router.get("/me", getCurrentUserProfile);
 router.put("/", updateProfile);
+router.patch("/change-password", changePassword);
 router.delete("/soft", softDeleteProfile);
-router.delete("/:userId/hard", authenticateAndAuthorize("admin"), deleteProfile);
+router.delete(
+  "/:userId/hard",
+  authenticateAndAuthorize("admin"),
+  deleteProfile
+);
 
 export default router;

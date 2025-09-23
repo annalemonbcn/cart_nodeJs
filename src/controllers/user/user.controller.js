@@ -1,18 +1,16 @@
 import { userServices } from "#services/user/user.services.js";
 import { BadRequestError } from "#utils/errors.js";
-import { validateUserIdInReq } from "./validations.js";
 
 const {
   getUserProfileByIdService,
   updateUserProfileByIdService,
+  updatePasswordService,
   deleteProfileByIdService,
   softDeleteProfileByIdService,
 } = userServices;
 
 const getCurrentUserProfile = async (req, res) => {
-  const userId = validateUserIdInReq(req);
-
-  const meProfile = await getUserProfileByIdService(userId);
+  const meProfile = await getUserProfileByIdService(req.user.id);
 
   res.status(200).json({
     status: "success",
@@ -22,15 +20,13 @@ const getCurrentUserProfile = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const userId = validateUserIdInReq(req);
-
   const fieldsToUpdate = req.body;
   if (Object.keys(fieldsToUpdate).length === 0) {
     throw new BadRequestError("updateProfile: Missing fields to update");
   }
 
   const updatedProfile = await updateUserProfileByIdService(
-    userId,
+    req.user.id,
     fieldsToUpdate
   );
 
@@ -42,10 +38,22 @@ const updateProfile = async (req, res) => {
   });
 };
 
-const softDeleteProfile = async (req, res) => {
-  const userId = validateUserIdInReq(req);
+// TODO: to be tested
+const changePassword = async (req, res) => {
+  const { password: newPassword } = req.body;
 
-  await softDeleteProfileByIdService(userId);
+  const updatedProfile = await updatePasswordService(req.user.id, newPassword);
+
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: updatedProfile,
+    message: "User password updated successfully",
+  });
+};
+
+const softDeleteProfile = async (req, res) => {
+  await softDeleteProfileByIdService(req.user.id);
 
   res.status(200).json({
     status: "success",
@@ -55,14 +63,11 @@ const softDeleteProfile = async (req, res) => {
 };
 
 const deleteProfile = async (req, res) => {
-  const { userId: userIdToRemove } = req.params;
-  if (!userIdToRemove) throw new BadRequestError("Invalid user id");
-
-  if (req.user.id === userIdToRemove) {
+  if (req.user.id === req.params.userId) {
     throw new BadRequestError("Admin cannot delete themselves");
   }
 
-  await deleteProfileByIdService(userIdToRemove);
+  await deleteProfileByIdService(req.params.userId);
 
   res.status(200).json({
     status: "success",
@@ -74,6 +79,7 @@ const deleteProfile = async (req, res) => {
 export {
   getCurrentUserProfile,
   updateProfile,
+  changePassword,
   softDeleteProfile,
   deleteProfile,
 };

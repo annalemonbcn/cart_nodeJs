@@ -8,15 +8,19 @@ const validateUserHasLessThanFiveAddresses = (userAddresses) => {
 
 const validateIsUniqueDefaultAddress = (
   isDefault,
-  currentAddressId,
-  userAddresses
+  userAddresses,
+  currentAddressId = null
 ) => {
   if (!isDefault) return;
 
-  const existingDefault = userAddresses
-    .filter((addr) => addr._id.toString() !== currentAddressId.toString())
-    .find((addr) => addr.isDefault);
-
+  const existingDefault = userAddresses.find((addr) => {
+    if (currentAddressId) {
+      return (
+        addr._id.toString() !== currentAddressId.toString() && addr.isDefault
+      );
+    }
+    return addr.isDefault;
+  });
   if (existingDefault) {
     throw new BadRequestError("User can only have one default address");
   }

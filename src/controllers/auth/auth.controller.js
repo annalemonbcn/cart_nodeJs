@@ -1,8 +1,8 @@
-import { authServices } from "#services/auth.services.js";
+import { authServices } from "#services/auth/auth.services.js";
 import { generateToken } from "./utils.js";
 import { BadRequestError } from "#utils/errors.js";
 
-const { registerUserService, loginUserService } = authServices;
+const { registerUserService, loginUserService, forgotPasswordService } = authServices;
 
 const sanitizeUser = (user) => {
   const toJSON = user.toJSON();
@@ -64,6 +64,16 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if(!email) throw new BadRequestError("Missing email in request");
+
+
+
+  forgotPasswordService(email)
+
+};
+
 const FRONT_URL = "http://localhost:5173";
 
 const googleCallback = (req, res) => {
@@ -76,4 +86,4 @@ const googleCallback = (req, res) => {
   res.redirect(`${FRONT_URL}/auth/success?token=${token}`);
 };
 
-export { registerUser, loginUser, googleCallback };
+export { registerUser, loginUser, forgotPassword, googleCallback };

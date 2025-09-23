@@ -14,7 +14,7 @@ const getUserProfileByIdService = async (userId) => {
 };
 
 const updateUserProfileByIdService = async (userId, fieldsToUpdate) => {
-  await getUserProfileByIdService(userId);
+  if (fieldsToUpdate.password) throw new BadRequestError();
 
   const { error } = updateUserProfileSchemaValidation.validate(fieldsToUpdate);
   if (error) throw new BadRequestError(error.details[0].message);
@@ -26,6 +26,15 @@ const updateUserProfileByIdService = async (userId, fieldsToUpdate) => {
 
   return await userDAO.updateUser(userId, fieldsToUpdate);
 };
+
+const updatePasswordService = async (userId, newPassword) => {
+  const { error } = updatePasswordSchemaValidation.validate({
+    password: newPassword,
+  });
+  if (error) throw new BadRequestError(error.details[0].message);
+
+  return await userDAO.updatePassword(userId, newPassword);
+}
 
 const softDeleteProfileByIdService = async (userId) =>
   withTransaction(async (session) => {
@@ -61,6 +70,7 @@ const deleteProfileByIdService = async (userId) =>
 const userServices = {
   getUserProfileByIdService,
   updateUserProfileByIdService,
+  updatePasswordService,
   softDeleteProfileByIdService,
   deleteProfileByIdService,
 };

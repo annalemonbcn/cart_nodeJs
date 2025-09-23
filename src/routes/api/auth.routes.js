@@ -1,11 +1,12 @@
 import { Router } from "express";
 import passport from "passport";
-import { loginUser, registerUser, googleCallback } from "#controllers/auth/auth.controller.js";
+import { loginUser, registerUser, forgotPassword, googleCallback } from "#controllers/auth/auth.controller.js";
 
 const router = Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/forgot-password", forgotPassword);
 
 router.get(
   "/google",

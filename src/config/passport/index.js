@@ -88,11 +88,13 @@ const startPassport = () => {
           });
           if (error) throw new BadRequestError(error.details[0].message);
 
-          const user = await userDAO.getActiveUserByEmail(username);
-          if (!user || !bcrypt.compareSync(password, user.password))
-            return done(
-              new UnauthorizedError("Email or password is incorrect")
-            );
+          const user = await userDAO.getUserByEmail(username);
+          if (
+            !user ||
+            user.deletedAt ||
+            !bcrypt.compareSync(password, user.password)
+          )
+            return done(new UnauthorizedError("Invalid credentials"));
 
           return done(null, user);
         } catch (error) {

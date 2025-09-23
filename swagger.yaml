@@ -862,12 +862,7 @@ components:
 
     UserProfileInput:
       type: object
-      required: [_id]
       properties:
-        id:
-          type: string
-          example: "64f1a2cfe2a83c0012345679"
-          description: ObjectId of the user
         firstName:
           type: string
           example: "Jane"
