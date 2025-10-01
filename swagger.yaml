@@ -1047,6 +1047,10 @@ components:
           maxItems: 5
           items:
             $ref: "#/components/schemas/AddressOutput"
+        cart:
+          type: string
+          example: "64f1a2cfe2a83c0012345679"
+          description: ObjectId of the cart
 
     UserInternalOutput:
       type: object
@@ -1459,12 +1463,6 @@ components:
               message:
                 type: string
                 example: Password reset email sent successfully
-              payload:
-                type: object
-                properties:
-                  previewURL:
-                    type: string
-                    example: https://example.com/reset-password?token=123456
 
     AuthResetPassword:
       description: Password successfully reset

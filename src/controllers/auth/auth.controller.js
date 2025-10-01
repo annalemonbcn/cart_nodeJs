@@ -1,7 +1,7 @@
 import "dotenv-flow/config";
 import { authServices } from "#services/auth/auth.services.js";
 import { generateToken } from "./utils.js";
-import { BadRequestError } from "#utils/errors.js";
+import { BadRequestError, UnauthorizedError } from "#utils/errors.js";
 
 const {
   registerUserService,
@@ -10,6 +10,7 @@ const {
   resetPasswordService,
 } = authServices;
 
+// TODO: is this useful?
 const sanitizeUser = (user) => {
   const toJSON = user.toJSON();
 
@@ -74,20 +75,20 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!email) throw new BadRequestError("Missing email in request");
 
-  const previewURL = await forgotPasswordService(email);
+  await forgotPasswordService(email);
 
   return res.status(200).json({
     status: "success",
     code: 200,
     message: "Password reset email sent successfully",
-    payload: { previewURL },
   });
 };
 
 const resetPassword = async (req, res) => {
   const { token, password } = req.body;
-  if (!token || !password)
-    throw new BadRequestError("Missing token or password in request");
+  if (!password) throw new BadRequestError("Password is required");
+
+  if (!token) throw new UnauthorizedError();
 
   await resetPasswordService(token, password);
 
