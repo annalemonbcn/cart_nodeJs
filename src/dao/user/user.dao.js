@@ -1,5 +1,4 @@
 import UserModel from "#models/user.model.js";
-import bcrypt from "bcrypt";
 
 const createUser = async (user, options = {}) => {
   const users = await UserModel.create([user], options);

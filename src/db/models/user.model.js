@@ -54,7 +54,6 @@ const userSchema = new mongoose.Schema(
     cart: {
       type: mongoose.Schema.Types.ObjectId,
       ref: collectionNames.cartsCollection,
-      required: true,
       unique: true,
     },
     addresses: {
@@ -98,6 +97,7 @@ userSchema.set("toJSON", {
 
 userSchema.pre("save", function (next) {
   if (!this.isModified("password")) return next();
+
   bcrypt
     .hash(this.password, Number(bcryptSalt))
     .then((hash) => {
