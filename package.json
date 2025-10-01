@@ -12,7 +12,8 @@
     "#middlewares/*": "./src/middlewares/*",
     "#constants": "./src/constants.js",
     "#utils/*": "./src/utils/*",
-    "#dao/*": "./src/dao/*"
+    "#dao/*": "./src/dao/*",
+    "#config/*": "./src/config/*"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/app.js",
