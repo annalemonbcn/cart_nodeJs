@@ -40,7 +40,20 @@ const updatePasswordService = async (userId, newPassword) => {
 
   const hashedPassword = encryptPassword(newPassword);
 
-  return await userDAO.updatePassword(userId, hashedPassword);
+  const user = await userDAO.updatePassword(userId, hashedPassword);
+
+  await sendMail({
+    to: user.email,
+    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_UPDATED,
+    dynamicTemplateData: {
+      firstName: user.firstName || "",
+      resetURL: `${process.env.FRONTEND_URL}/forgot-password?mode=change`,
+    },
+    categories: ["auth", "password-change"],
+    customArgs: { userId: String(user._id), purpose: "password_change" },
+  });
+
+  return user;
 };
 
 const softDeleteProfileByIdService = async (userId) =>
