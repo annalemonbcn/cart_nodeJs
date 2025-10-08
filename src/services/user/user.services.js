@@ -8,6 +8,7 @@ import {
   updateUserProfileSchemaValidation,
 } from "./validations.js";
 import { encryptPassword } from "#utils/bcrypt.js";
+import { sendMail } from "#config/mailer/index.js";
 
 const getUserProfileByIdService = async (userId) => {
   const userProfile = await userDAO.getActiveUserById(userId);
@@ -55,6 +56,16 @@ const softDeleteProfileByIdService = async (userId) =>
     }
 
     await userDAO.softDelete(userId, { session });
+
+    await sendMail({
+      to: user.email,
+      templateId: process.env.SENDGRID_TEMPLATE_DELETE_ACCOUNT,
+      dynamicTemplateData: {
+        firstName: user.firstName || "",
+      },
+      categories: ["auth", "delete-account"],
+      customArgs: { userId: String(user._id), purpose: "delete_account" },
+    });
   });
 
 const deleteProfileByIdService = async (userId) =>

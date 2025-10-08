@@ -46,7 +46,7 @@ const forgotPasswordService = async (email) => {
     to: user.email,
     templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_RESET,
     dynamicTemplateData: {
-      user: { firstName: user.firstName || "" },
+      firstName: user.firstName || "",
       resetURL,
     },
     categories: ["auth", "password-reset"],
