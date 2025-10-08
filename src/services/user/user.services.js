@@ -8,6 +8,7 @@ import {
   updateUserProfileSchemaValidation,
 } from "./validations.js";
 import { encryptPassword } from "#utils/bcrypt.js";
+import { sendMail } from "#config/mailer/index.js";
 
 const getUserProfileByIdService = async (userId) => {
   const userProfile = await userDAO.getActiveUserById(userId);
@@ -39,7 +40,20 @@ const updatePasswordService = async (userId, newPassword) => {
 
   const hashedPassword = encryptPassword(newPassword);
 
-  return await userDAO.updatePassword(userId, hashedPassword);
+  const user = await userDAO.updatePassword(userId, hashedPassword);
+
+  await sendMail({
+    to: user.email,
+    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_UPDATED,
+    dynamicTemplateData: {
+      firstName: user.firstName || "",
+      resetURL: `${process.env.FRONTEND_URL}/forgot-password?mode=change`,
+    },
+    categories: ["auth", "password-change"],
+    customArgs: { userId: String(user._id), purpose: "password_change" },
+  });
+
+  return user;
 };
 
 const softDeleteProfileByIdService = async (userId) =>
@@ -55,6 +69,16 @@ const softDeleteProfileByIdService = async (userId) =>
     }
 
     await userDAO.softDelete(userId, { session });
+
+    await sendMail({
+      to: user.email,
+      templateId: process.env.SENDGRID_TEMPLATE_DELETE_ACCOUNT,
+      dynamicTemplateData: {
+        firstName: user.firstName || "",
+      },
+      categories: ["auth", "delete-account"],
+      customArgs: { userId: String(user._id), purpose: "delete_account" },
+    });
   });
 
 const deleteProfileByIdService = async (userId) =>

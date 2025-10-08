@@ -1,5 +1,4 @@
 import "dotenv-flow/config";
-import nodemailer from "nodemailer";
 import passport from "passport";
 import { userDAO } from "#dao/user/user.dao.js";
 import { BadRequestError, NotFoundError } from "#utils/errors.js";
@@ -9,8 +8,7 @@ import {
 } from "./validations.js";
 import { decodeToken, generateToken } from "#controllers/auth/utils.js";
 import { encryptPassword } from "#utils/bcrypt.js";
-import { emailTemplates } from "#utils/emailtemplates/resetPassword.js";
-import sgMail from "#config/sendgrid/index.js";
+import { sendMail } from "#config/mailer/index.js";
 
 const registerUserService = (req) => {
   return new Promise((resolve) => {
@@ -40,16 +38,20 @@ const forgotPasswordService = async (email) => {
   if (!user) throw new NotFoundError("User not found");
 
   const token = generateToken({ id: user._id, email: user.email });
-  const resetURL = `${process.env.FRONTEND_URL}/reset-password?token=${token}&mode=reset`;
+  const resetURL = `${
+    process.env.FRONTEND_URL
+  }/reset-password?token=${encodeURIComponent(token)}&mode=reset`;
 
-  const msg = {
+  await sendMail({
     to: user.email,
-    from: "annalemonbcn.dev@gmail.com",
-    subject: "Password Reset Request",
-    html: emailTemplates.passwordResetTemplate(user, resetURL),
-  };
-
-  await sgMail.send(msg);
+    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_RESET,
+    dynamicTemplateData: {
+      firstName: user.firstName || "",
+      resetURL,
+    },
+    categories: ["auth", "password-forgot"],
+    customArgs: { userId: String(user._id), purpose: "password_forgot" },
+  });
 };
 
 const resetPasswordService = async (token, password) => {
@@ -64,6 +66,17 @@ const resetPasswordService = async (token, password) => {
   const hashedPassword = encryptPassword(password);
 
   await userDAO.updatePassword(activeUser._id, hashedPassword);
+
+  await sendMail({
+    to: activeUser.email,
+    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_UPDATED,
+    dynamicTemplateData: {
+      firstName: activeUser.firstName || "",
+      resetURL: `${process.env.FRONTEND_URL}/forgot-password`,
+    },
+    categories: ["auth", "password-reset"],
+    customArgs: { userId: String(activeUser._id), purpose: "password_reset" },
+  });
 };
 
 const authServices = {
