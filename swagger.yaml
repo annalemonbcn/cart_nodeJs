@@ -739,7 +739,21 @@ components:
             properties:
               name:
                 type: string
-                enum: [black, yellow, pink, red]
+                enum:
+                  [
+                    purple,
+                    black,
+                    red,
+                    orange,
+                    navy,
+                    white,
+                    broom,
+                    green,
+                    yellow,
+                    grey,
+                    pink,
+                    blue,
+                  ]
               available:
                 type: boolean
         price:
@@ -753,7 +767,7 @@ components:
           items:
             type: string
             enum:
-              [electronics, fashion, home, sports, beauty, games, books, music]
+              [tops, t-shirts, jeans, shoes, skirts, dresses, bags, accessories]
         thumbnails:
           type: array
           items:

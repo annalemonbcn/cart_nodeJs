@@ -53,7 +53,7 @@ const productSchemaValidation = Joi.object({
         available: Joi.boolean(),
       })
     )
-    .length(4)
+    .length(validColours.length)
     .required(),
   price: Joi.number().required(),
   stock: Joi.number().required(),
@@ -102,7 +102,7 @@ const updateProductSchemaValidation = Joi.object({
         available: Joi.boolean(),
       })
     )
-    .length(4)
+    .length(validColours.length)
     .optional(),
   price: Joi.number().optional(),
   stock: Joi.number().optional(),
