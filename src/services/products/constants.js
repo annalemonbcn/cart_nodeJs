@@ -1,3 +1,5 @@
+import { COLORS } from "../../db/constants/index.js";
+
 const validFabric = [
   "cotton",
   "polyester",
@@ -20,20 +22,7 @@ const validStyle = [
 ];
 const validBrands = ["naikis", "adwidas", "poma", "rwebook"];
 const validSizes = ["XS", "S", "M", "L", "XL"];
-const validColours = [
-  "purple",
-  "black",
-  "red",
-  "orange",
-  "navy",
-  "white",
-  "broom",
-  "green",
-  "yellow",
-  "grey",
-  "pink",
-  "blue",
-];
+const validColours = COLORS;
 const validCategories = [
   "tops",
   "t-shirts",

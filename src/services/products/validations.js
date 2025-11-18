@@ -44,15 +44,8 @@ const productSchemaValidation = Joi.object({
   sizes: Joi.array()
     .items(Joi.string().valid(...validSizes))
     .required(),
-  colours: Joi.array()
-    .items(
-      Joi.object({
-        name: Joi.string()
-          .valid(...validColours)
-          .required(),
-        available: Joi.boolean(),
-      })
-    )
+  colors: Joi.array()
+    .items(Joi.string().valid(...validColours))
     .length(validColours.length)
     .required(),
   price: Joi.number().required(),

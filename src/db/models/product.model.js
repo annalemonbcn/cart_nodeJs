@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { collectionNames } from "../constants/index.js";
+import { collectionNames, COLORS } from "../constants/index.js";
 
 const featuresSchema = new mongoose.Schema({
   fabric: {
@@ -64,46 +64,14 @@ const productSchema = new mongoose.Schema({
     default: [],
     required: true,
   },
-  colours: {
+  colors: {
     type: [
       {
-        name: {
-          type: String,
-          enum: [
-            "purple",
-            "black",
-            "red",
-            "orange",
-            "navy",
-            "white",
-            "broom",
-            "green",
-            "yellow",
-            "grey",
-            "pink",
-            "blue",
-          ],
-        },
-        available: {
-          type: Boolean,
-          default: true,
-        },
+        type: String,
+        enum: COLORS,
       },
     ],
-    default: [
-      { name: "purple", available: false },
-      { name: "black", available: false },
-      { name: "red", available: false },
-      { name: "orange", available: false },
-      { name: "navy", available: false },
-      { name: "white", available: false },
-      { name: "broom", available: false },
-      { name: "green", available: false },
-      { name: "yellow", available: false },
-      { name: "grey", available: false },
-      { name: "pink", available: false },
-      { name: "blue", available: false },
-    ],
+    default: [],
     required: true,
   },
   price: {

@@ -704,10 +704,11 @@ components:
           code,
           title,
           description,
+          gender,
           brand,
           features,
           sizes,
-          colours,
+          colors,
           price,
           status,
           stock,
@@ -721,6 +722,10 @@ components:
           type: string
         description:
           type: string
+        gender:
+          type: string
+          enum: [men, women, unisex]
+          required: true
         brand:
           type: string
           enum: [naikis, adwidas, poma, rwebook]
@@ -732,30 +737,25 @@ components:
           items:
             type: string
             enum: [XS, S, M, L, XL]
-        colours:
+        colors:
           type: array
           items:
-            type: object
-            properties:
-              name:
-                type: string
-                enum:
-                  [
-                    purple,
-                    black,
-                    red,
-                    orange,
-                    navy,
-                    white,
-                    broom,
-                    green,
-                    yellow,
-                    grey,
-                    pink,
-                    blue,
-                  ]
-              available:
-                type: boolean
+            type: string
+            enum:
+              [
+                purple,
+                black,
+                red,
+                orange,
+                navy,
+                white,
+                broom,
+                green,
+                yellow,
+                grey,
+                pink,
+                blue,
+              ]
         price:
           type: number
           example: 39.99

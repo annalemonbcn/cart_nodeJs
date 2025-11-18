@@ -10,4 +10,19 @@ const collectionNames = {
   productsCollection,
 };
 
-export { collectionNames };
+const COLORS = [
+  "purple",
+  "black",
+  "red",
+  "orange",
+  "navy",
+  "white",
+  "broom",
+  "green",
+  "yellow",
+  "grey",
+  "pink",
+  "blue",
+];
+
+export { collectionNames, COLORS };
