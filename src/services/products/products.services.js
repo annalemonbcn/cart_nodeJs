@@ -13,8 +13,17 @@ import {
 import { toUpper } from "./helpers.js";
 
 const fetchProductsService = async (req) => {
-  const { page, limit, category, color, size, brand, minPrice, maxPrice } =
-    req.query;
+  const {
+    page,
+    limit,
+    category,
+    color,
+    size,
+    brand,
+    minPrice,
+    maxPrice,
+    gender,
+  } = req.query;
 
   const categoryArr = parseParamsList(category);
   const colorArr = parseParamsList(color);
@@ -26,6 +35,7 @@ const fetchProductsService = async (req) => {
   if (colorArr) filter.colors = { $in: colorArr };
   if (sizeArr) filter.sizes = { $in: sizeArr };
   if (brandArr) filter.brand = { $in: brandArr };
+  if (gender) filter.gender = gender;
 
   const price = buildPriceFilter(minPrice, maxPrice);
   if (price) filter.price = price;

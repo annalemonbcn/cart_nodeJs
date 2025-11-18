@@ -724,7 +724,7 @@ components:
           type: string
         gender:
           type: string
-          enum: [men, women, unisex]
+          enum: [men, women]
           required: true
         brand:
           type: string

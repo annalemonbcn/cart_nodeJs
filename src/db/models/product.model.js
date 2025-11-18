@@ -49,6 +49,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  gender: {
+    type: String,
+    enum: ["men", "women"],
+    required: true,
+  },
   brand: {
     type: String,
     enum: ["naikis", "adwidas", "poma", "rwebook"],
