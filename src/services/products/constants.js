@@ -20,6 +20,7 @@ const validStyle = [
   "elegant",
   "formal",
 ];
+const validGender = ["men", "women"];
 const validBrands = ["naikis", "adwidas", "poma", "rwebook"];
 const validSizes = ["XS", "S", "M", "L", "XL"];
 const validColours = COLORS;
@@ -45,4 +46,5 @@ export {
   validSizes,
   validColours,
   validCategories,
+  validGender,
 };

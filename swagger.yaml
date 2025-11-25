@@ -76,6 +76,26 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/products/filters:
+    get:
+      tags:
+        - Products
+      summary: Get filters
+      description: Returns a list of filters (optional gender filter)
+      parameters:
+        - name: gender
+          in: query
+          schema:
+            type: string
+            enum: [men, women]
+            default: men
+          description: Gender filter
+      responses:
+        "200":
+          $ref: "#/components/responses/FiltersFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/products/{pid}:
     get:
       tags:
@@ -727,35 +747,17 @@ components:
           enum: [men, women]
           required: true
         brand:
-          type: string
-          enum: [naikis, adwidas, poma, rwebook]
-          required: true
+          $ref: "#/components/schemas/Brand"
         features:
           $ref: "#/components/schemas/ProductFeatures"
         sizes:
           type: array
           items:
-            type: string
-            enum: [XS, S, M, L, XL]
+            $ref: "#/components/schemas/Size"
         colors:
           type: array
           items:
-            type: string
-            enum:
-              [
-                purple,
-                black,
-                red,
-                orange,
-                navy,
-                white,
-                broom,
-                green,
-                yellow,
-                grey,
-                pink,
-                blue,
-              ]
+            $ref: "#/components/schemas/Color"
         price:
           type: number
           example: 39.99
@@ -913,6 +915,32 @@ components:
               example: 64f1a2cfe2a83c0012345679
               description: ObjectId referencing the user
 
+    Size:
+      type: string
+      enum: [XS, S, M, L, XL]
+
+    Color:
+      type: string
+      enum:
+        [
+          purple,
+          black,
+          red,
+          orange,
+          navy,
+          white,
+          broom,
+          green,
+          yellow,
+          grey,
+          pink,
+          blue,
+        ]
+
+    Brand:
+      type: string
+      enum: [naikis, adwidas, poma, rwebook]
+
     # 📥 "Inputs" = form inputs data shape
     RegisterUserInput:
       type: object
@@ -1024,6 +1052,39 @@ components:
               type: string
               example: "64e3cfc2b567b3c5fcd36b92"
               description: ObjectId of the product
+
+    FiltersOutput:
+      type: object
+      required: [categories, brands, colors, sizes, prices]
+      properties:
+        categories:
+          type: array
+          items:
+            type: string
+            example: "tops"
+            description: Category names
+        brands:
+          type: array
+          items:
+            $ref: "#/components/schemas/Brand"
+        colors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Color"
+        sizes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Size"
+        prices:
+          type: object
+          required: [min, max]
+          properties:
+            min:
+              type: number
+              example: 10
+            max:
+              type: number
+              example: 100
 
     CartOutput:
       allOf:
@@ -1201,6 +1262,15 @@ components:
           properties:
             payload:
               $ref: "#/components/schemas/ProductOutput"
+
+    FiltersResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              $ref: "#/components/schemas/FiltersOutput"
 
     CartResponse:
       allOf:
@@ -1395,6 +1465,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeleteResponse"
+
+    FiltersFound:
+      description: Filters found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FiltersResponse"
 
     # - Cart responses
     CartCreated:

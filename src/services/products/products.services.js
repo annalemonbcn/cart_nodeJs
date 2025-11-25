@@ -10,7 +10,7 @@ import {
   productSchemaValidation,
   updateProductSchemaValidation,
 } from "./validations.js";
-import { toUpper } from "./helpers.js";
+import { getRawFilterId, toUpper } from "./helpers.js";
 
 const fetchProductsService = async (req) => {
   const {
@@ -87,6 +87,29 @@ const fetchProductsService = async (req) => {
   };
 };
 
+const getFiltersService = async (req) => {
+  const { gender } = req.query;
+
+  const filterBase = {};
+  if (gender) filterBase.gender = gender;
+
+  const raw = await productDAO.getFilters(filterBase);
+
+  return {
+    categories: getRawFilterId(raw.categories),
+    brands: getRawFilterId(raw.brand),
+    colors: getRawFilterId(raw.colors),
+    sizes: getRawFilterId(raw.sizes),
+    prices:
+      raw.prices && raw.prices[0]
+        ? {
+            min: raw.prices[0].min,
+            max: raw.prices[0].max,
+          }
+        : null,
+  };
+};
+
 const createProductService = async (product) => {
   const { error } = productSchemaValidation.validate(product);
   if (error) throw new BadRequestError(error.details[0].message);
@@ -108,6 +131,7 @@ const productServices = {
   createProductService,
   updateProductService,
   deleteProductService,
+  getFiltersService,
 };
 
 export { productServices };
