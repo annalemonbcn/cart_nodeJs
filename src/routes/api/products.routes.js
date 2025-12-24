@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getAllProducts,
   getProductById,
+  getFilters,
   updateProduct,
 } from "#controllers/products/products.controller.js";
 import { collectionNames } from "../../db/constants/index.js";
@@ -17,6 +18,7 @@ router.param(
   validateParam("pid", collectionNames.productsCollection, "product")
 );
 
+router.get("/filters", getFilters);
 router.get("/", getAllProducts);
 router.get("/:pid", getProductById);
 router.post("/", authenticateAndAuthorize("admin"), createProduct);

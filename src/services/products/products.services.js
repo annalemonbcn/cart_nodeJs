@@ -1,34 +1,54 @@
 import { productDAO } from "#dao/products/product.dao.js";
 import { BadRequestError } from "#utils/errors.js";
-import { buildPaginationLinks } from "../../helpers/index.js";
+import {
+  parseParamsList,
+  buildPriceFilter,
+  parsePagination,
+  buildPaginationLinks,
+} from "./utils.js";
 import {
   productSchemaValidation,
   updateProductSchemaValidation,
 } from "./validations.js";
+import { getRawFilterId, toUpper } from "./helpers.js";
 
 const fetchProductsService = async (req) => {
-  const { page, limit, query, sort } = req.query;
+  const {
+    page,
+    limit,
+    category,
+    color,
+    size,
+    brand,
+    minPrice,
+    maxPrice,
+    gender,
+  } = req.query;
 
-  let filter = {};
-  if (query) {
-    const [key, value] = query.split(":");
-    if (["category", "status"].includes(key)) {
-      filter[key] = value;
-    }
-  }
+  const categoryArr = parseParamsList(category);
+  const colorArr = parseParamsList(color);
+  const sizeArr = parseParamsList(size, toUpper);
+  const brandArr = parseParamsList(brand);
 
-  let sortOption = {};
-  if (sort === "asc") sortOption.price = 1;
-  else if (sort === "desc") sortOption.price = -1;
+  const filter = {};
+  if (categoryArr) filter.categories = { $in: categoryArr };
+  if (colorArr) filter.colors = { $in: colorArr };
+  if (sizeArr) filter.sizes = { $in: sizeArr };
+  if (brandArr) filter.brand = { $in: brandArr };
+  if (gender) filter.gender = gender;
 
-  const parsedPage = parseInt(page) || 1;
-  const parsedLimit = parseInt(limit) || 10;
+  const price = buildPriceFilter(minPrice, maxPrice);
+  if (price) filter.price = price;
 
-  const options = {
+  const { page: parsedPage, limit: parsedLimit } = parsePagination({
+    page,
+    limit,
+  });
+
+  const result = await productDAO.get(filter, {
     page: parsedPage,
     limit: parsedLimit,
-    sort: sortOption,
-  };
+  });
 
   const {
     docs,
@@ -38,18 +58,17 @@ const fetchProductsService = async (req) => {
     nextPage,
     hasPrevPage,
     hasNextPage,
-  } = await productDAO.get(filter, options);
+    totalDocs,
+  } = result;
 
-  const { prevLink, nextLink } = buildPaginationLinks(
-    req,
-    query,
-    sort,
-    parsedLimit,
+  const { prevLink, nextLink } = buildPaginationLinks(req, {
+    page: currentPage,
+    limit: parsedLimit,
     prevPage,
     nextPage,
     hasPrevPage,
-    hasNextPage
-  );
+    hasNextPage,
+  });
 
   return {
     docs,
@@ -62,8 +81,32 @@ const fetchProductsService = async (req) => {
       hasNextPage,
       prevLink,
       nextLink,
-      totalDocs: docs.length,
+      totalDocs,
+      limit: parsedLimit,
     },
+  };
+};
+
+const getFiltersService = async (req) => {
+  const { gender } = req.query;
+
+  const filterBase = {};
+  if (gender) filterBase.gender = gender;
+
+  const raw = await productDAO.getFilters(filterBase);
+
+  return {
+    categories: getRawFilterId(raw.categories),
+    brands: getRawFilterId(raw.brand),
+    colors: getRawFilterId(raw.colors),
+    sizes: getRawFilterId(raw.sizes),
+    prices:
+      raw.prices && raw.prices[0]
+        ? {
+            min: raw.prices[0].min,
+            max: raw.prices[0].max,
+          }
+        : null,
   };
 };
 
@@ -88,6 +131,7 @@ const productServices = {
   createProductService,
   updateProductService,
   deleteProductService,
+  getFiltersService,
 };
 
 export { productServices };
