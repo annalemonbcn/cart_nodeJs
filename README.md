@@ -1,60 +1,82 @@
-# 🛒 Cart NodeJS
+# 🛒 Cart NodeJS — RESTful Shopping Cart API
 
-Backend for shopping cart management, built with **Node.js**, **Express**, **MongoDB** and **Mongoose**.
+A powerful and easy-to-use **backend application** built with **Node.js, Express, and MongoDB** to manage products and shopping carts for e-commerce apps.
 
-## 🚀 Table of Contents
+Designed with clean architecture and flexible APIs, this project makes it perfect for learning, extending, and integrating into full-stack applications.
 
-1. [Description](#-description)
-2. [Technologies](#-technologies)
-3. [Startup](#-startup)
-4. [Environment Variables](#-environment-variables)
-5. [Project Structure](#-project-structure)
-6. [Seeding](#-seeding)
-7. [Endpoints](#-endpoints)
-8. [Models](#-models)
-9. [API Documentation](#-api-documentation)
-10. [Live API](#-live-api)
+## 🧩 Project Status
+- ✅ Backend: fully functional (products, carts, users, auth, JWT, Swagger)
+- 🚧 Frontend: currently implements user register, login and profile update. Checkout de frontend project [here](https://github.com/annalemonbcn/cart_nodeJs_front_ts)
+- 📦 The backend is ready to support a full e-commerce frontend (catalog, cart, checkout, etc.)
+
+## 📋 Table of Contents
+
+1. [Features](#-features)
+2. [Built With](#-built-with)
+3. [Technologies](#-technologies)
+4. [Installation](#-installation)
+6. [Configuration](#-configuration)
+7. [Project Structure](#-project-structure)
+8. [Database Seeding](#-database-seeding)
+9. [API Endpoints](#-api-endpoints)
+10. [API Documentation](#-api-documentation)
+11. [Live API](#-live-api)
+12. [Acknowledgements](#-acknowledgements)
+
+## 🚀 Features
+
++ ✔ Fully RESTful API
++ ✔ Product and Cart management
++ ✔ Add/remove items from carts
++ ✔ Pagination and query filters for products
++ ✔ Database seeding scripts
++ ✔ Swagger API documentation
++ ✔ Ready for integration with front-ends or mobile apps
 
 ---
 
-## 📋 Description
+## 🧠 Built With
 
-This project provides a RESTful backend for managing a shopping cart. It allows you to **create and update products and carts**, as well as add or remove products from a cart.
+This project uses modern, widely-adopted technologies and tools:
+
+- [Node.js](https://nodejs.org/) — JavaScript runtime
+- [Express](https://expressjs.com/) — Lightweight web framework
+- [MongoDB](https://www.mongodb.com/) — NoSQL database + ORM
+- [Swagger](https://swagger.io/tools/swagger-ui/) — Auto-generated API docs
+- [Nodemon](https://github.com/remy/nodemon) — Live reload during development
+- [Faker](https://fakerjs.dev/) — Sample data generation
+
+### 🔧 Additional Technologies Worth Highlighting
+
+Besides Node, Express and MongoDB, this project also uses:
+
+- JWT (JSON Web Tokens) — Authentication & protected routes
+- bcrypt — Secure password hashing
+- dotenv — Environment configuration
+- Express Router — Modular routing architecture
+- Middleware architecture — Auth, error handling, validations
+- MVC-ish structure — Controllers, services, models, routes separation
 
 ---
 
-## 🧰 Technologies
+## 📦 Installation
 
-- [Node.js](https://nodejs.org/)  
-- [Express](https://expressjs.com/)  
-- [MongoDB](https://www.mongodb.com/) 
-- [Mongoose](https://mongoosejs.com/)
-- [Swagger](https://swagger.io/tools/swagger-ui/)
-- [Nodemon](https://github.com/remy/nodemon) (for development)
-- [Faker](https://fakerjs.dev/) (for development)
-
----
-
-## 🔧 Startup
-
-Clone the repository:
+Get started locally in just a few steps:
 
 ```bash
+# Clone the repository
 git clone https://github.com/annalemonbcn/cart_nodeJs.git
 cd cart_nodeJs
-```
 
-Install dependencies:
-
-```bash
+# Install dependencies
 npm install
 ```
 
 ---
 
-## 🔑 Environment Variables
+## ⚙️ Configuration
 
-Create a `.env` file in the root directory and add the following variables:
+Create a `.env` file in the project root directory:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
@@ -68,69 +90,79 @@ PORT=8080
 
 ## 📂 Project Structure
 
-```
+```bash
 /
 ├── src/
-│   ├── controllers/    # Route logic
-│   └── db/             
-│       ├── config/     # Database config
-│       ├── models/     # Mongoose schemas
-│       └── seeders/    # Seeders to feed db
-│   ├── helpers/        # Services utilities
-│   ├── routes/         # Express routes
-│   ├── services/       # Business logic
-│   ├── utils/          # Utilities
-│   └── app.js          # Main file
-├── .env                # Environment variables
+│   ├── controllers/      # Route handlers
+│   ├── db/
+│   │   ├── config/        # DB setup
+│   │   ├── models/        # Mongoose schemas
+│   │   └── seeders/       # Sample data scripts
+│   ├── helpers/           # Utility services
+│   ├── routes/            # API routes
+│   ├── services/          # Business logic
+│   ├── utils/             # Helper utilities
+│   └── app.js             # Entry point
+├── .env                   # Environment variables
 ├── package.json
-└── README.md
+└── swagger.yaml           # API specification
 ```
 
 ---
 
-## 🌱 Seeding
+## 🌱 Database Seeding
 
 You can populate the database with sample products using the following command:
 
 ```bash
+# Generate sample products
 node src/db/seeders/products.js
-```
 
-The same for carts:
-
-```bash
+# Generate sample carts
 node src/db/seeders/carts.js
 ```
 
 ---
 
-## 🧭 Endpoints
+## 🧭 API Endpoints
 
-### Carts (`/api/carts`)
-- `GET /` – Get all carts
-- `GET /:id` – Get cart by ID
-- `POST /` – Create new cart
-- `PUT /:id` – Update cart
-- `DELETE /:id` – Delete cart
-- `POST /:id/products` – Add product to cart
-- `DELETE /:id/products/:prodId` – Remove product from cart
+### 🛒 Cart Routes
+| Method | Endpoint | Description |
+| ------------- | ------------- | ------------- |
+| GET  | `/api/carts` | Get all carts |
+| GET  | `/api/carts/:id` | Get a single cart by ID |
+| POST  | `/api/carts` | Create a new cart |
+| PUT  | `/api/carts/:id` | Update an existing cart |
+| DELETE  | `/api/carts/:id` | Remove a cart |
+| POST  | `/api/carts/:id/products` | Add product to cart |
+| DELETE  | `/api/carts/:id/products/:prodId` | Remove product from cart |
 
-### Products (`/api/products`)
-- `GET /` – Get all products (with pagination/query params)
-- `GET /:id` – Get product by ID
-- `POST /` – Create product
-- `PUT /:id` – Update product
-- `DELETE /:id` – Delete product
+### 🛍️ Product Routes
+| Method | Endpoint | Description |
+| ------------- | ------------- | ------------- |
+| GET  | `/api/products` | List products (pagination/filters) |
+| GET  | `/api/products/:id` | Get product details |
+| POST  | `/api/products` | Create a product |
+| PUT  | `/api/products/:id` | Update product |
+| DELETE  | `/api/products/:id` | Remove product |
 
----
+### 👤 User Routes
+> These are especially important since the frontend already uses them.
+| Method | Endpoint | Description |
+| ------------- | ------------- | ------------- |
+| GET  | `/api/users` | Get all users |
+| GET  | `/api/users/:id` | Get user by ID |
+| POST  | `/api/users` | Create a new user |
+| PUT  | `/api/users/:id` | Update user data |
+| DELETE  | `/api/users/:id` | Delete user |
 
-## 📦 Models
-
-- **Product**  
-  `title`, `description`, `price`, `stock`, `category`, etc.
-
-- **Cart**  
-  Array of products, having `{ product: ObjectId, quantity: Number }`.
+### 🔐 Auth Routes
+> These power register, login and session authentication in the frontend.
+| Method | Endpoint | Description |
+| ------------- | ------------- | ------------- |
+| POST  | `/api/auth/register` | Register new user |
+| POST  | `/api/auth/login` | Login and get JWT token |
+| GET  | `/api/auth/me` | Get current authenticated user |
 
 ---
 
@@ -142,7 +174,7 @@ Interactive API documentation is available at:
 http://localhost:8080/api-docs
 ```
 
-It is automatically generated using **Swagger UI** and provides a complete overview of all available endpoints.
+Explore every endpoint with live examples and try requests directly from your browser.
 
 You can also access it online at:
 
@@ -161,3 +193,9 @@ Use this base URL to test endpoints.
 
 Example:  
 `GET https://cartnodejs-production.up.railway.app/api/products`
+
+---
+
+## 🤝 Acknowledgements
+
+Built by Anna Esteve aka annalemonbcn— showcase of API design and Node.js skill.
