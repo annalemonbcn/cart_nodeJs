@@ -13,9 +13,8 @@ Designed with clean architecture and flexible APIs, this project makes it perfec
 
 1. [Features](#-features)
 2. [Built With](#-built-with)
-3. [Technologies](#-technologies)
 4. [Installation](#-installation)
-6. [Configuration](#-configuration)
+6. [Configuration](#configuration)
 7. [Project Structure](#-project-structure)
 8. [Database Seeding](#-database-seeding)
 9. [API Endpoints](#-api-endpoints)
@@ -73,7 +72,7 @@ npm install
 ```
 
 ---
-
+<a id="configuration"></a>
 ## ⚙️ Configuration
 
 Create a `.env` file in the project root directory:
