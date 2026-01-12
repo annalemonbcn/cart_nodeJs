@@ -9,19 +9,6 @@ Designed with clean architecture and flexible APIs, this project makes it perfec
 - 🚧 Frontend: currently implements user register, login and profile update. Checkout de frontend project [here](https://github.com/annalemonbcn/cart_nodeJs_front_ts)
 - 📦 The backend is ready to support a full e-commerce frontend (catalog, cart, checkout, etc.)
 
-## 📋 Table of Contents
-
-1. [Features](#-features)
-2. [Built With](#-built-with)
-4. [Installation](#-installation)
-6. [Configuration](#configuration)
-7. [Project Structure](#-project-structure)
-8. [Database Seeding](#-database-seeding)
-9. [API Endpoints](#-api-endpoints)
-10. [API Documentation](#-api-documentation)
-11. [Live API](#-live-api)
-12. [Acknowledgements](#-acknowledgements)
-
 ## 🚀 Features
 
 + ✔ Fully RESTful API
@@ -31,8 +18,6 @@ Designed with clean architecture and flexible APIs, this project makes it perfec
 + ✔ Database seeding scripts
 + ✔ Swagger API documentation
 + ✔ Ready for integration with front-ends or mobile apps
-
----
 
 ## 🧠 Built With
 
@@ -56,8 +41,6 @@ Besides Node, Express and MongoDB, this project also uses:
 - Middleware architecture — Auth, error handling, validations
 - MVC-ish structure — Controllers, services, models, routes separation
 
----
-
 ## 📦 Installation
 
 Get started locally in just a few steps:
@@ -71,8 +54,6 @@ cd cart_nodeJs
 npm install
 ```
 
----
-<a id="configuration"></a>
 ## ⚙️ Configuration
 
 Create a `.env` file in the project root directory:
@@ -84,8 +65,6 @@ PORT=8080
 
 - Replace `your_mongodb_connection_string` with your actual MongoDB URI (local or remote).
 - `PORT` is the port your Express server will run on (default: 8080).
-
----
 
 ## 📂 Project Structure
 
@@ -107,8 +86,6 @@ PORT=8080
 └── swagger.yaml           # API specification
 ```
 
----
-
 ## 🌱 Database Seeding
 
 You can populate the database with sample products using the following command:
@@ -120,8 +97,6 @@ node src/db/seeders/products.js
 # Generate sample carts
 node src/db/seeders/carts.js
 ```
-
----
 
 ## 🧭 API Endpoints
 
@@ -163,8 +138,6 @@ node src/db/seeders/carts.js
 | POST  | `/api/auth/login` | Login and get JWT token |
 | GET  | `/api/auth/me` | Get current authenticated user |
 
----
-
 ## 📚 API Documentation
 
 Interactive API documentation is available at:
@@ -181,8 +154,6 @@ You can also access it online at:
 https://cartnodejs-prod.up.railway.app/api-docs
 ```
 
----
-
 ## 🌐 Live API
 
 The backend is deployed on [Railway](https://railway.app/):
@@ -192,8 +163,6 @@ Use this base URL to test endpoints.
 
 Example:  
 `GET https://cartnodejs-production.up.railway.app/api/products`
-
----
 
 ## 🤝 Acknowledgements
 
