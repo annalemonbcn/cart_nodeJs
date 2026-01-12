@@ -8,7 +8,7 @@ import {
 } from "./validations.js";
 import { decodeToken, generateToken } from "#controllers/auth/utils.js";
 import { encryptPassword } from "#utils/bcrypt.js";
-import { sendMail } from "#config/mailer/index.js";
+import { sendBrevoMail } from "#config/mailer/index.js";
 
 const registerUserService = (req) => {
   return new Promise((resolve) => {
@@ -42,15 +42,13 @@ const forgotPasswordService = async (email) => {
     process.env.FRONTEND_URL
   }/reset-password?token=${encodeURIComponent(token)}&mode=reset`;
 
-  await sendMail({
+  await sendBrevoMail({
     to: user.email,
-    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_RESET,
+    templateId: process.env.BREVO_TEMPLATE_PASSWORD_RESET,
     dynamicTemplateData: {
       firstName: user.firstName || "",
       resetURL,
     },
-    categories: ["auth", "password-forgot"],
-    customArgs: { userId: String(user._id), purpose: "password_forgot" },
   });
 };
 
@@ -67,15 +65,13 @@ const resetPasswordService = async (token, password) => {
 
   await userDAO.updatePassword(activeUser._id, hashedPassword);
 
-  await sendMail({
+  await sendBrevoMail({
     to: activeUser.email,
-    templateId: process.env.SENDGRID_TEMPLATE_PASSWORD_UPDATED,
+    templateId: process.env.BREVO_TEMPLATE_PASSWORD_UPDATED,
     dynamicTemplateData: {
       firstName: activeUser.firstName || "",
-      resetURL: `${process.env.FRONTEND_URL}/forgot-password`,
+      profileURL: `${process.env.FRONTEND_URL}/my-account/profile`,
     },
-    categories: ["auth", "password-reset"],
-    customArgs: { userId: String(activeUser._id), purpose: "password_reset" },
   });
 };
 
