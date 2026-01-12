@@ -1,3 +1,5 @@
+import { COLORS } from "../../db/constants/index.js";
+
 const validFabric = [
   "cotton",
   "polyester",
@@ -18,9 +20,10 @@ const validStyle = [
   "elegant",
   "formal",
 ];
+const validGender = ["men", "women"];
 const validBrands = ["naikis", "adwidas", "poma", "rwebook"];
 const validSizes = ["XS", "S", "M", "L", "XL"];
-const validColours = ["black", "yellow", "pink", "red"];
+const validColours = COLORS;
 const validCategories = [
   "tops",
   "t-shirts",
@@ -43,4 +46,5 @@ export {
   validSizes,
   validColours,
   validCategories,
+  validGender,
 };

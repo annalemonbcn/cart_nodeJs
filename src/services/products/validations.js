@@ -10,6 +10,7 @@ import {
   validSizes,
   validColours,
   validCategories,
+  validGender
 } from "./constants.js";
 
 const featuresSchemaValidation = Joi.object({
@@ -37,6 +38,9 @@ const productSchemaValidation = Joi.object({
   code: Joi.string().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),
+  gender: Joi.string()
+    .valid(...validGender)
+    .required(),
   brand: Joi.string()
     .valid(...validBrands)
     .required(),
@@ -44,16 +48,8 @@ const productSchemaValidation = Joi.object({
   sizes: Joi.array()
     .items(Joi.string().valid(...validSizes))
     .required(),
-  colours: Joi.array()
-    .items(
-      Joi.object({
-        name: Joi.string()
-          .valid(...validColours)
-          .required(),
-        available: Joi.boolean(),
-      })
-    )
-    .length(4)
+  colors: Joi.array()
+    .items(Joi.string().valid(...validColours))
     .required(),
   price: Joi.number().required(),
   stock: Joi.number().required(),
@@ -88,6 +84,9 @@ const updateProductSchemaValidation = Joi.object({
   code: Joi.string().optional(),
   title: Joi.string().optional(),
   description: Joi.string().optional(),
+  gender: Joi.string()
+    .valid(...validGender)
+    .optional(),
   brand: Joi.string()
     .valid(...validBrands)
     .optional(),
@@ -102,7 +101,7 @@ const updateProductSchemaValidation = Joi.object({
         available: Joi.boolean(),
       })
     )
-    .length(4)
+    .length(validColours.length)
     .optional(),
   price: Joi.number().optional(),
   stock: Joi.number().optional(),

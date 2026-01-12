@@ -6,6 +6,7 @@ const {
   createProductService,
   updateProductService,
   deleteProductService,
+  getFiltersService,
 } = productServices;
 
 const getAllProducts = async (req, res) => {
@@ -27,6 +28,17 @@ const getProductById = async (req, res) =>
     message: "Product retrieved successfully",
     payload: req.product,
   });
+
+const getFilters = async (req, res) => {
+  const filters = await getFiltersService(req);
+
+  return res.status(200).json({
+    status: "success",
+    code: 200,
+    message: "Filters retrieved successfully",
+    payload: filters,
+  });
+};
 
 const createProduct = async (req, res) => {
   const product = req.body;
@@ -80,4 +92,5 @@ export {
   createProduct,
   updateProduct,
   deleteProduct,
+  getFilters
 };
