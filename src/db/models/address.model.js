@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { collectionNames } from "../constants/index.js";
+import { collectionNames, modelNames } from "../constants/index.js";
 
 const deliveryAddressSchema = new mongoose.Schema({
   street: {
@@ -25,41 +25,44 @@ const deliveryAddressSchema = new mongoose.Schema({
   },
 });
 
-const addressSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: collectionNames.usersCollection,
-    required: true,
+const addressSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: modelNames.userModel,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    deliveryAddress: {
+      type: deliveryAddressSchema,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
+    tags: {
+      type: [String],
+      default: [],
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  deliveryAddress: {
-    type: deliveryAddressSchema,
-    required: true,
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-  },
-  isDefault: {
-    type: Boolean,
-    default: false,
-  },
-  tags: {
-    type: [String],
-    default: [],
-  },
-  deletedAt: {
-    type: Date,
-    default: null,
-  },
-});
+  { collection: collectionNames.addressesCollection }
+);
 
 addressSchema.set("toJSON", {
   virtuals: true,
@@ -76,9 +79,8 @@ addressSchema.set("toJSON", {
   },
 });
 
-const AddressModel = mongoose.model(
-  collectionNames.addressesCollection,
-  addressSchema
-);
+const AddressModel =
+  mongoose.models[modelNames.addressModel] ||
+  mongoose.model(modelNames.addressModel, addressSchema);
 
 export default AddressModel;
