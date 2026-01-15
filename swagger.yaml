@@ -1383,12 +1383,18 @@ components:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
         - type: object
-          required: [payload]
+          required: [payload, meta]
           properties:
             payload:
               type: array
               items:
                 $ref: "#/components/schemas/ObjectId"
+            meta:
+              type: object
+              properties:
+                action:
+                  type: string
+                  example: "added"
 
   responses:
     # - Error responses
