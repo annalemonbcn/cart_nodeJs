@@ -132,9 +132,6 @@ productSchema.set("toJSON", {
 });
 
 productSchema.plugin(mongoosePaginate);
-const ProductModel = mongoose.model(
-  collectionNames.productsCollection,
-  productSchema
-);
+const ProductModel = mongoose.model("Product", productSchema);
 
 export default ProductModel;

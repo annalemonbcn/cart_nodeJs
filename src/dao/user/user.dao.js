@@ -1,4 +1,5 @@
 import UserModel from "#models/user.model.js";
+import mongoose from "mongoose";
 
 const createUser = async (user, options = {}) => {
   const users = await UserModel.create([user], options);
@@ -70,6 +71,7 @@ const getUserFavourites = async (userId, { populate = false } = {}) => {
 
   if (populate) query = query.populate("favourites");
 
+  console.log(mongoose.modelNames());
   return await query;
 };
 

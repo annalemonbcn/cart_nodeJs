@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: collectionNames.productsCollection,
+          ref: "Product",
         },
       ],
       default: [],

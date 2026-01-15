@@ -1,7 +1,7 @@
 const addressesCollection = "addresses";
 const usersCollection = "users";
 const cartsCollection = "carts";
-const productsCollection = "products";
+const productsCollection = "Product";
 
 const collectionNames = {
   addressesCollection,
