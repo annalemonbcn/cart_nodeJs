@@ -56,6 +56,15 @@ const userSchema = new mongoose.Schema(
       ref: collectionNames.cartsCollection,
       unique: true,
     },
+    favourites: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: collectionNames.productsCollection,
+        },
+      ],
+      default: [],
+    },
     addresses: {
       type: [
         {

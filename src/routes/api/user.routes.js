@@ -6,7 +6,11 @@ import {
   changePassword,
   softDeleteProfile,
   deleteProfile,
+  getFavourites,
+  toggleFavourite,
 } from "#controllers/user/user.controller.js";
+import { validateParam } from "#middlewares/validateParam/index.js";
+import { collectionNames } from "../../db/constants/index.js";
 
 const router = Router();
 
@@ -21,5 +25,13 @@ router.delete(
   authenticateAndAuthorize("admin"),
   deleteProfile
 );
+
+router.get("/favourites", getFavourites);
+
+router.param(
+  "productId",
+  validateParam("productId", collectionNames.productsCollection, "product")
+);
+router.patch("/favourites/:productId", toggleFavourite);
 
 export default router;

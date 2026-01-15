@@ -93,12 +93,29 @@ const deleteProfileByIdService = async (userId) =>
     await userDAO.hardDelete(userId, { session });
   });
 
+const getFavouritesService = async (userId) => {
+  const user = await getUserProfileByIdService(userId);
+  return user.favourites;
+};
+
+const toggleFavouriteService = async (userId, productId) => {
+  const user = await getUserProfileByIdService(userId);
+  const favourites = user.favourites;
+
+  const exists = favourites.some((id) => id.toString() === productId);
+
+  if (exists) return await userDAO.removeFavourite(userId, productId);
+  return await userDAO.setFavourite(userId, productId);
+};
+
 const userServices = {
   getUserProfileByIdService,
   updateUserProfileByIdService,
   updatePasswordService,
   softDeleteProfileByIdService,
   deleteProfileByIdService,
+  getFavouritesService,
+  toggleFavouriteService,
 };
 
 export { userServices };

@@ -7,6 +7,8 @@ const {
   updatePasswordService,
   deleteProfileByIdService,
   softDeleteProfileByIdService,
+  getFavouritesService,
+  toggleFavouriteService,
 } = userServices;
 
 const getCurrentUserProfile = async (req, res) => {
@@ -75,10 +77,38 @@ const deleteProfile = async (req, res) => {
   });
 };
 
+const getFavourites = async (req, res) => {
+  const favourites = await getFavouritesService(req.user.id);
+
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: favourites,
+    message: "User favourites retrieved successfully",
+  });
+};
+
+const toggleFavourite = async (req, res) => {
+  const userId = req.user.id;
+  const productId = req.params.productId;
+
+  const user = await toggleFavouriteService(userId, productId);
+  const favourites = user.favourites;
+
+  res.status(200).json({
+    status: "success",
+    code: 200,
+    payload: favourites,
+    message: "User favourites toggled successfully",
+  });
+};
+
 export {
   getCurrentUserProfile,
   updateProfile,
   changePassword,
   softDeleteProfile,
   deleteProfile,
+  getFavourites,
+  toggleFavourite,
 };
