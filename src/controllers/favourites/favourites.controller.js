@@ -3,7 +3,9 @@ import { favouritesServices } from "#services/favourites/favourites.services.js"
 const { getFavouritesService, toggleFavouriteService } = favouritesServices;
 
 const getFavourites = async (req, res) => {
-  const favourites = await getFavouritesService(req.user.id);
+  const populate = req.query.populate === "true";
+
+  const favourites = await getFavouritesService(req.user.id, { populate });
 
   res.status(200).json({
     status: "success",

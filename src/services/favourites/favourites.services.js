@@ -3,8 +3,11 @@ import { userServices } from "../user/user.services.js";
 
 const { getUserProfileByIdService } = userServices;
 
-const getFavouritesService = async (userId) => {
-  const user = await getUserProfileByIdService(userId);
+const getFavouritesService = async (userId, { populate } = {}) => {
+  const user = await userDAO.getUserFavourites(userId, { populate });
+
+  if (!user) throw new NotFoundError(`User with id ${userId} doesn't exist`);
+
   return user.favourites;
 };
 

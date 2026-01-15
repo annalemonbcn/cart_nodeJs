@@ -561,10 +561,18 @@ paths:
     get:
       tags:
         - Favourites
-      summary: Get all users favourites
-      description: Get all users favourites
+      summary: Get user favourites
+      description: Get user favourites
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: populate
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, returns full Product objects instead of product ids.
       responses:
         "200":
           $ref: "#/components/responses/FavouritesFound"
@@ -1368,7 +1376,7 @@ components:
             payload:
               $ref: "#/components/schemas/AddressOutput"
 
-    FavouritesResponse:
+    FavouritesIdsResponse:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
         - type: object
@@ -1378,6 +1386,17 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/ObjectId"
+
+    FavouritesPopulatedResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductOutput"
 
     FavouriteToggled:
       allOf:
@@ -1695,7 +1714,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/FavouritesResponse"
+            oneOf:
+              - $ref: "#/components/schemas/FavouritesIdsResponse"
+              - $ref: "#/components/schemas/FavouritesPopulatedResponse"
 
     FavouriteToggledResponse:
       description: User favourite toggled
