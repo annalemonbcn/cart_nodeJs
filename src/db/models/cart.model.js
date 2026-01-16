@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { collectionNames } from "../constants/index.js";
+import { collectionNames, modelNames } from "../constants/index.js";
 
 const productSchema = new mongoose.Schema(
   {
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: collectionNames.productsCollection,
+      ref: modelNames.productModel,
       required: true,
     },
     quantity: {
@@ -23,7 +23,7 @@ const cartSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: collectionNames.usersCollection,
+      ref: modelNames.userModel,
       required: true,
       unique: true,
     },
@@ -37,7 +37,7 @@ const cartSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { strict: true }
+  { strict: true, collection: collectionNames.cartsCollection }
 );
 
 cartSchema.set("toJSON", {
@@ -52,6 +52,8 @@ cartSchema.set("toJSON", {
   },
 });
 
-const CartModel = mongoose.model(collectionNames.cartsCollection, cartSchema);
+const CartModel =
+  mongoose.models[modelNames.cartModel] ||
+  mongoose.model(modelNames.cartModel, cartSchema);
 
 export default CartModel;

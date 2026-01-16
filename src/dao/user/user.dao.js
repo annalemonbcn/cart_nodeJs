@@ -63,6 +63,32 @@ const softDelete = async (userId, options = {}) =>
 const hardDelete = async (userId, options = {}) =>
   await UserModel.findByIdAndDelete(userId, options);
 
+const getUserFavourites = async (userId, { populate = false } = {}) => {
+  let query = UserModel.findOne({ _id: userId, deletedAt: null }).select(
+    "favourites"
+  );
+
+  if (populate) query = query.populate("favourites");
+
+  return await query;
+};
+
+const setFavourite = async (userId, productId) => {
+  return await UserModel.findByIdAndUpdate(
+    userId,
+    { $addToSet: { favourites: productId } },
+    { new: true }
+  );
+};
+
+const removeFavourite = async (userId, productId) => {
+  return await UserModel.findByIdAndUpdate(
+    userId,
+    { $pull: { favourites: productId } },
+    { new: true }
+  );
+};
+
 const userDAO = {
   createUser,
   getUserById,
@@ -77,6 +103,9 @@ const userDAO = {
   isEmailUnique,
   softDelete,
   hardDelete,
+  getUserFavourites,
+  setFavourite,
+  removeFavourite,
 };
 
 export { userDAO };

@@ -557,6 +557,59 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/user/favourites:
+    get:
+      tags:
+        - Favourites
+      summary: Get user favourites
+      description: Get user favourites
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: populate
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: If true, returns full Product objects instead of product ids.
+      responses:
+        "200":
+          $ref: "#/components/responses/FavouritesFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/user/favourites/:productId:
+    patch:
+      tags:
+        - Favourites
+      summary: Patch favourite in user
+      description: Toggle a favourite in the user favourites array
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to toggle as favourite
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/FavouriteToggledResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/address:
     post:
       tags:
@@ -687,6 +740,11 @@ components:
       bearerFormat: JWT
 
   schemas:
+    ObjectId:
+      type: string
+      pattern: "^[a-fA-F0-9]{24}$"
+      example: "691ca49a96dc98e40fa4391f"
+
     # 📦 Base models (pure data)
     ProductFeatures:
       type: object
@@ -1318,6 +1376,45 @@ components:
             payload:
               $ref: "#/components/schemas/AddressOutput"
 
+    FavouritesIdsResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: "#/components/schemas/ObjectId"
+
+    FavouritesPopulatedResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload]
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductOutput"
+
+    FavouriteToggled:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          required: [payload, meta]
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: "#/components/schemas/ObjectId"
+            meta:
+              type: object
+              properties:
+                action:
+                  type: string
+                  example: "added"
+
   responses:
     # - Error responses
     BadRequest:
@@ -1610,6 +1707,23 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeleteResponse"
+
+    # - Favourites responses
+    FavouritesFound:
+      description: User favourites found
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/FavouritesIdsResponse"
+              - $ref: "#/components/schemas/FavouritesPopulatedResponse"
+
+    FavouriteToggledResponse:
+      description: User favourite toggled
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FavouriteToggled"
 
     # - Address responses
     AddressFound:

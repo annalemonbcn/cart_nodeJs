@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { collectionNames } from "../constants/index.js";
+import { collectionNames, modelNames } from "../constants/index.js";
 import bcrypt from "bcrypt";
 import "dotenv-flow/config";
 
@@ -53,14 +53,23 @@ const userSchema = new mongoose.Schema(
     },
     cart: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: collectionNames.cartsCollection,
+      ref: modelNames.cartModel,
       unique: true,
+    },
+    favourites: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: modelNames.productModel,
+        },
+      ],
+      default: [],
     },
     addresses: {
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: collectionNames.addressesCollection,
+          ref: modelNames.addressModel,
         },
       ],
       default: [],
@@ -71,7 +80,7 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true, collection: collectionNames.usersCollection }
 );
 
 userSchema.set("toJSON", {
@@ -107,6 +116,8 @@ userSchema.pre("save", function (next) {
     .catch(next);
 });
 
-const UserModel = mongoose.model(collectionNames.usersCollection, userSchema);
+const UserModel =
+  mongoose.models[modelNames.userModel] ||
+  mongoose.model(modelNames.userModel, userSchema);
 
 export default UserModel;

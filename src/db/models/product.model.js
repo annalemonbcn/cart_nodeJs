@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { collectionNames, COLORS } from "../constants/index.js";
+import { collectionNames, modelNames, COLORS } from "../constants/index.js";
 
 const featuresSchema = new mongoose.Schema({
   fabric: {
@@ -35,78 +35,83 @@ const featuresSchema = new mongoose.Schema({
   },
 });
 
-const productSchema = new mongoose.Schema({
-  code: {
-    type: String,
-    required: true,
-    unique: true,
+const productSchema = new mongoose.Schema(
+  {
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["men", "women"],
+      required: true,
+    },
+    brand: {
+      type: String,
+      enum: ["naikis", "adwidas", "poma", "rwebook"],
+      required: true,
+    },
+    features: {
+      type: featuresSchema,
+      required: true,
+    },
+    sizes: {
+      type: [String],
+      enum: ["XS", "S", "M", "L", "XL"],
+      default: [],
+      required: true,
+    },
+    colors: {
+      type: [
+        {
+          type: String,
+          enum: COLORS,
+        },
+      ],
+      default: [],
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    stock: {
+      type: Number,
+      required: true,
+    },
+    categories: {
+      type: [String],
+      enum: [
+        "tops",
+        "t-shirts",
+        "jeans",
+        "shoes",
+        "skirts",
+        "dresses",
+        "bags",
+        "accessories",
+      ],
+      required: true,
+    },
+    thumbnails: {
+      type: [String],
+      default: [],
+      required: true,
+    },
   },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ["men", "women"],
-    required: true,
-  },
-  brand: {
-    type: String,
-    enum: ["naikis", "adwidas", "poma", "rwebook"],
-    required: true,
-  },
-  features: {
-    type: featuresSchema,
-    required: true,
-  },
-  sizes: {
-    type: [String],
-    enum: ["XS", "S", "M", "L", "XL"],
-    default: [],
-    required: true,
-  },
-  colors: {
-    type: [
-      {
-        type: String,
-        enum: COLORS,
-      },
-    ],
-    default: [],
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  stock: {
-    type: Number,
-    required: true,
-  },
-  categories: {
-    type: [String],
-    enum: [
-      "tops",
-      "t-shirts",
-      "jeans",
-      "shoes",
-      "skirts",
-      "dresses",
-      "bags",
-      "accessories",
-    ],
-    required: true,
-  },
-  thumbnails: {
-    type: [String],
-    default: [],
-    required: true,
-  },
-});
+  {
+    collection: collectionNames.productsCollection,
+  }
+);
 
 productSchema.set("toJSON", {
   virtuals: true,
@@ -132,9 +137,8 @@ productSchema.set("toJSON", {
 });
 
 productSchema.plugin(mongoosePaginate);
-const ProductModel = mongoose.model(
-  collectionNames.productsCollection,
-  productSchema
-);
+const ProductModel =
+  mongoose.models[modelNames.productModel] ||
+  mongoose.model(modelNames.productModel, productSchema);
 
 export default ProductModel;
