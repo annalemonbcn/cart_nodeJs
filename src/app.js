@@ -24,6 +24,14 @@ app.use(passport.initialize());
 
 app.use(router);
 
+app.get("/__version", (req, res) => {
+  res.json({
+    renderCommit: process.env.RENDER_GIT_COMMIT,
+    nodeEnv: process.env.NODE_ENV,
+    time: new Date().toISOString(),
+  });
+});
+
 app.use(errorHandler);
 
 const startServer = async () => {
