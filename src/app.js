@@ -9,7 +9,7 @@ import { startPassport } from "./config/passport/index.js";
 import { connectToDatabase } from "./config/db/index.js";
 import router from "#routes/index.js";
 import { errorHandler } from "#middlewares/errorHandler/index.js";
-import "./db/constants/index.js";
+// import "./db/constants/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -23,14 +23,6 @@ startPassport();
 app.use(passport.initialize());
 
 app.use(router);
-
-app.get("/__version", (req, res) => {
-  res.json({
-    renderCommit: process.env.RENDER_GIT_COMMIT,
-    nodeEnv: process.env.NODE_ENV,
-    time: new Date().toISOString(),
-  });
-});
 
 app.use(errorHandler);
 
