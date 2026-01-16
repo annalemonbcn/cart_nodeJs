@@ -7,18 +7,10 @@ const getFavourites = async (req, res) => {
 
   const favourites = await getFavouritesService(req.user.id, { populate });
 
-  const first = favourites?.[0];
-
   res.status(200).json({
     status: "success",
     code: 200,
     payload: favourites,
-    meta: {
-      populatedRequested: populate,
-      firstType: first ? typeof first : null,
-      firstIsObject: first ? typeof first === "object" : null,
-      firstHasThumbnails: first ? !!first?.thumbnails : null,
-    },
     message: "User favourites retrieved successfully",
   });
 };
