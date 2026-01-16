@@ -3,7 +3,7 @@ import { favouritesServices } from "#services/favourites/favourites.services.js"
 const { getFavouritesService, toggleFavouriteService } = favouritesServices;
 
 const getFavourites = async (req, res) => {
-  const populate = req.query.populate === "true";
+  const populate = String(req.query.populate).toLowerCase() === "true";
 
   const favourites = await getFavouritesService(req.user.id, { populate });
 
